@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { Home, User, Code, Folder, Award, Mail } from 'lucide-react';
-import PillNav from './components/PillNav';
+import GooeyNav from './components/GooeyNav';
 import ThemeToggle from './components/ThemeToggle';
 import Menu3D from './sections/Menu3D';
 import { navigationItems, menu3dItems } from './data/content';
@@ -47,15 +47,11 @@ function App() {
     <ThemeProvider>
       <div className="h-screen overflow-hidden bg-white dark:bg-gray-900 transition-colors duration-300">
         {/* Navigation */}
-        <PillNav
+        <GooeyNav
           items={navItems}
-          activeHref={`#${activeSection}`}
-          onItemClick={handleTopNavClick}
-          className=""
-          baseColor="#0b1220"
-          pillColor="#111a2f"
-          hoveredPillTextColor="#0b1220"
-          pillTextColor="#e5e7eb"
+          activeIndex={navItems.findIndex((x) => x.id === activeSection)}
+          onItemClick={(item) => handleTopNavClick(item)}
+          initialActiveIndex={0}
         />
 
         {/* 3D Menu (only UI) */}

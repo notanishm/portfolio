@@ -630,6 +630,19 @@ class InfiniteGridMenu {
 
   setActiveIndex(activeIndex) {
     this.activeIndex = activeIndex;
+    this.activeDetailScroll = this.scrollLinesByItem?.[activeIndex] ?? 0;
+    this.#updateAtlasTextures();
+  }
+
+  scrollActive(linesDelta) {
+    if (!this.items.length) return;
+    const active = this.activeIndex ?? 0;
+    const meta = this.activeDetailMeta;
+    const maxScroll = meta ? Math.max(0, meta.totalLines - meta.maxLines) : 0;
+    const next = Math.min(maxScroll, Math.max(0, (this.scrollLinesByItem[active] || 0) + linesDelta));
+    if (next === (this.scrollLinesByItem[active] || 0)) return;
+    this.scrollLinesByItem[active] = next;
+    this.activeDetailScroll = next;
     this.#updateAtlasTextures();
   }
 
@@ -750,20 +763,24 @@ class InfiniteGridMenu {
     this.atlasCanvas.width = this.atlasSize * this.cellSize;
     this.atlasCanvas.height = this.atlasSize * this.cellSize;
 
+    this.scrollLinesByItem = new Array(this.items.length).fill(0);
+    this.activeDetailMeta = null;
+    this.activeDetailScroll = 0;
+
     this.photoImg = null;
     const needsPhoto = this.items.some((it) => Boolean(it.includePhoto));
     if (needsPhoto) {
       this.photoImg = new Image();
       this.photoImg.onload = () => {
         // Re-render detail canvases now that the photo is available.
-        this.detailCanvases = this.items.map((item) => this.#renderDetail(item));
+        this.detailCanvases = this.items.map((item) => this.#renderDetail(item).canvas);
         this.#updateAtlasTextures();
       };
       this.photoImg.src = '/profile-photo.jpg';
     }
 
     this.thumbCanvases = this.items.map((item) => this.#renderThumb(item));
-    this.detailCanvases = this.items.map((item) => this.#renderDetail(item));
+    this.detailCanvases = this.items.map((item) => this.#renderDetail(item).canvas);
     this.activeIndex = 0;
     this.#updateAtlasTextures();
   }
@@ -782,12 +799,14 @@ class InfiniteGridMenu {
       ctx.drawImage(c, x, y, this.cellSize, this.cellSize);
     });
 
-    // Replace focused item with detail canvas
+    // Replace focused item with detail canvas (re-render on demand for scroll)
     const active = this.activeIndex ?? 0;
-    if (this.detailCanvases[active]) {
+    if (this.items[active]) {
+      const rendered = this.#renderDetail(this.items[active], this.scrollLinesByItem[active] || 0);
+      this.activeDetailMeta = rendered.meta;
       const x = (active % this.atlasSize) * this.cellSize;
       const y = Math.floor(active / this.atlasSize) * this.cellSize;
-      ctx.drawImage(this.detailCanvases[active], x, y, this.cellSize, this.cellSize);
+      ctx.drawImage(rendered.canvas, x, y, this.cellSize, this.cellSize);
     }
 
     gl.bindTexture(gl.TEXTURE_2D, this.tex);
@@ -809,24 +828,25 @@ class InfiniteGridMenu {
     return c;
   }
 
-  #renderDetail(item) {
+  #renderDetail(item, scrollLines = 0) {
     const c = document.createElement('canvas');
     c.width = this.cellSize;
     c.height = this.cellSize;
     const ctx = c.getContext('2d');
-    this.#drawCard(ctx, {
+    const meta = this.#drawCard(ctx, {
       accent: item.accent,
       title: item.detailTitle || item.title,
       lines: item.detailLines || [],
       footerLines: item.detailFooterLines || [],
       includePhoto: Boolean(item.includePhoto),
       dense: Boolean(item.dense),
+      scrollLines,
       mode: 'detail',
     });
-    return c;
+    return { canvas: c, meta };
   }
 
-  #drawCard(ctx, { accent, title, lines, footerLines, includePhoto, dense, mode }) {
+  #drawCard(ctx, { accent, title, lines, footerLines, includePhoto, dense, scrollLines = 0, mode }) {
     const w = this.cellSize;
     const h = this.cellSize;
     const pad = 56;
@@ -843,43 +863,66 @@ class InfiniteGridMenu {
       ctx.closePath();
     };
 
-    // Background gradient
-    const g = ctx.createLinearGradient(0, 0, w, h);
-    g.addColorStop(0, accentColor);
-    g.addColorStop(1, '#0b1220');
-    ctx.fillStyle = g;
+    // Grainient-style background (approximation of ReactBits Grainient)
+    const bg = ctx.createLinearGradient(0, 0, w, h);
+    bg.addColorStop(0, '#ff8080');
+    bg.addColorStop(0.55, '#ffffff');
+    bg.addColorStop(1, '#c0c0c0');
+    ctx.fillStyle = bg;
     roundRect(0, 0, w, h, radius);
     ctx.fill();
 
-    // Soft highlights
-    ctx.fillStyle = 'rgba(255,255,255,0.08)';
-    ctx.beginPath();
-    ctx.ellipse(w * 0.28, h * 0.2, w * 0.22, h * 0.16, 0, 0, Math.PI * 2);
+    // Vignette to improve contrast
+    const vignette = ctx.createRadialGradient(w * 0.5, h * 0.45, w * 0.1, w * 0.5, h * 0.55, w * 0.72);
+    vignette.addColorStop(0, 'rgba(10,18,32,0.12)');
+    vignette.addColorStop(1, 'rgba(10,18,32,0.72)');
+    ctx.fillStyle = vignette;
+    roundRect(0, 0, w, h, radius);
     ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+
+    // Subtle grain
+    ctx.save();
+    ctx.globalAlpha = 0.08;
+    const grainStep = 6;
+    for (let yy = 0; yy < h; yy += grainStep) {
+      for (let xx = 0; xx < w; xx += grainStep) {
+        const v = Math.random() * 255;
+        ctx.fillStyle = `rgb(${v},${v},${v})`;
+        ctx.fillRect(xx, yy, 1, 1);
+      }
+    }
+    ctx.restore();
+
+    // Accent edge glow
+    ctx.strokeStyle = `${accentColor}55`;
+    ctx.lineWidth = 10;
     ctx.beginPath();
-    ctx.ellipse(w * 0.82, h * 0.82, w * 0.28, h * 0.22, 0, 0, Math.PI * 2);
-    ctx.fill();
+    roundRect(8, 8, w - 16, h - 16, radius - 10);
+    ctx.stroke();
+
+    // Safe padding for circular disc (avoid edge clipping when mapped onto a circle)
+    const safePad = 140;
+    const titleY = 120;
 
     // Title
     ctx.fillStyle = 'rgba(255,255,255,0.96)';
-    ctx.font = mode === 'thumb' ? '900 78px Inter, system-ui, sans-serif' : '900 56px Inter, system-ui, sans-serif';
+    ctx.font = mode === 'thumb' ? '900 66px Inter, system-ui, sans-serif' : '900 54px Inter, system-ui, sans-serif';
     ctx.textBaseline = 'top';
-    ctx.fillText(String(title || '').toUpperCase(), pad, 66, w - pad * 2);
+    ctx.fillText(String(title || '').toUpperCase(), safePad, titleY, w - safePad * 2);
 
     // Divider
     ctx.fillStyle = 'rgba(255,255,255,0.22)';
-    ctx.fillRect(pad, mode === 'thumb' ? 170 : 150, w - pad * 2, 3);
+    ctx.fillRect(safePad, mode === 'thumb' ? 200 : 190, w - safePad * 2, 3);
 
     if (mode === 'thumb') return;
 
     // Photo (optional)
-    let textStartY = 210;
-    let textMaxWidth = w - pad * 2;
+    let textStartY = 260;
+    let textMaxWidth = w - safePad * 2;
     if (includePhoto) {
       const photoSize = 168;
-      const px = pad;
-      const py = 206;
+      const px = safePad;
+      const py = 252;
       ctx.save();
       roundRect(px, py, photoSize, photoSize, 28);
       ctx.clip();
@@ -895,10 +938,10 @@ class InfiniteGridMenu {
       ctx.restore();
 
       textStartY = py;
-      textMaxWidth = w - pad * 2 - photoSize - 28;
+      textMaxWidth = w - safePad * 2 - photoSize - 28;
     }
 
-    const x = includePhoto ? pad + 168 + 28 : pad;
+    const x = includePhoto ? safePad + 168 + 28 : safePad;
     const maxY = h - 72;
 
     const buildRenderLines = (maxChars) => {
@@ -935,9 +978,9 @@ class InfiniteGridMenu {
     };
 
     // Auto-fit text: shrink font if needed to show more lines.
-    let fontSize = dense ? 22 : 28;
-    let lineH = dense ? 30 : 38;
-    let maxChars = includePhoto ? (dense ? 28 : 32) : (dense ? 38 : 44);
+    let fontSize = dense ? 20 : 26;
+    let lineH = dense ? 28 : 36;
+    let maxChars = includePhoto ? (dense ? 30 : 34) : (dense ? 42 : 48);
 
     let renderLines = buildRenderLines(maxChars);
     let y = textStartY;
@@ -954,7 +997,8 @@ class InfiniteGridMenu {
     ctx.font = `600 ${fontSize}px Inter, system-ui, sans-serif`;
     ctx.textBaseline = 'top';
 
-    const visible = renderLines.slice(0, Math.max(0, maxLines));
+    const start = Math.min(Math.max(0, scrollLines), Math.max(0, renderLines.length - maxLines));
+    const visible = renderLines.slice(start, start + Math.max(0, maxLines));
     visible.forEach((l) => {
       if (y > maxY) return;
       if (l === '') {
@@ -966,11 +1010,15 @@ class InfiniteGridMenu {
     });
 
     // If clipped, add a subtle continuation hint.
-    if (renderLines.length > maxLines) {
-      ctx.fillStyle = 'rgba(255,255,255,0.75)';
-      ctx.font = `700 ${fontSize}px Inter, system-ui, sans-serif`;
-      ctx.fillText('...', x, Math.min(maxY, y), textMaxWidth);
+    const totalLines = renderLines.length;
+    if (totalLines > maxLines) {
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.font = `800 ${Math.max(18, Math.round(fontSize * 0.9))}px Inter, system-ui, sans-serif`;
+      const hint = start > 0 && start + maxLines < totalLines ? 'Scroll: ^ v' : start > 0 ? 'Scroll: ^' : 'Scroll: v';
+      ctx.fillText(hint, x, maxY + 6, textMaxWidth);
     }
+
+    return { totalLines, maxLines };
   }
 
   #initDiscInstances(count) {
@@ -1005,12 +1053,12 @@ class InfiniteGridMenu {
     this.control.update(deltaTime, this.TARGET_FRAME_DURATION);
 
     const positions = this.instancePositions.map((p) => vec3.transformQuat(vec3.create(), p, this.control.orientation));
-    const baseScale = 0.34;
+    const baseScale = 0.42;
     const SCALE_INTENSITY = 0.6;
     positions.forEach((p, ndx) => {
       const s = (Math.abs(p[2]) / this.SPHERE_RADIUS) * SCALE_INTENSITY + (1 - SCALE_INTENSITY);
       const isFocused = this.nearestVertexIndex === ndx;
-      const focusBoost = isFocused ? 1.6 : 1.0;
+      const focusBoost = isFocused ? 2.25 : 1.0;
       const finalScale = s * baseScale * focusBoost;
       const matrix = mat4.create();
       mat4.multiply(matrix, matrix, mat4.fromTranslation(mat4.create(), vec3.negate(vec3.create(), p)));
@@ -1183,12 +1231,32 @@ const InfiniteMenu3D = forwardRef(function InfiniteMenu3D(
       m.run();
     }, scale);
 
+    const onWheel = (e) => {
+      // Allow scrolling within the focused disc when details overflow.
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? 2 : -2;
+      menuRef.current?.scrollActive(delta);
+    };
+
+    const onKeyDown = (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      e.preventDefault();
+      const cur = menuRef.current?.activeIndex ?? 0;
+      const next = e.key === 'ArrowRight' ? cur + 1 : cur - 1;
+      menuRef.current?.focusItem(next);
+    };
+
+    canvas.addEventListener('wheel', onWheel, { passive: false });
+    window.addEventListener('keydown', onKeyDown);
+
     const onResize = () => menu?.resize();
     window.addEventListener('resize', onResize);
     menu.resize();
 
     return () => {
       window.removeEventListener('resize', onResize);
+      window.removeEventListener('keydown', onKeyDown);
+      canvas.removeEventListener('wheel', onWheel);
     };
   }, [resolvedItems, scale, onActiveItemChange, onMovementChange]);
 
