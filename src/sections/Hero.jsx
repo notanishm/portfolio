@@ -4,8 +4,8 @@ import { personalInfo } from '../data/content';
 
 const Hero = () => {
   const scrollToNext = () => {
-    const aboutSection = document.getElementById('about');
-    aboutSection?.scrollIntoView({ behavior: 'smooth' });
+    const menuSection = document.getElementById('menu');
+    menuSection?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (

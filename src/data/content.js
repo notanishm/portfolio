@@ -158,3 +158,35 @@ export const navigationItems = [
   { id: 'certifications', label: 'Certifications', icon: 'Award' },
   { id: 'contact', label: 'Contact', icon: 'Mail' },
 ];
+
+const svgDataUri = (label, accent = '#2f78ff') => {
+  const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="${accent}" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#0b1220" stop-opacity="1"/>
+    </linearGradient>
+    <radialGradient id="r" cx="50%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="900" height="900" fill="url(#g)"/>
+  <rect width="900" height="900" fill="url(#r)"/>
+  <g fill="#ffffff" fill-opacity="0.92" font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto" text-anchor="middle">
+    <text x="450" y="470" font-size="84" font-weight="800" letter-spacing="1">${label}</text>
+  </g>
+</svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+};
+
+// Items used by the ReactBits Infinite Menu (3D). Keep these titles generic and resume-safe.
+export const menu3dItems = [
+  { id: 'home', title: 'Home', description: '', link: '#home', image: '/profile-photo.jpg' },
+  { id: 'about', title: 'About', description: '', link: '#about', image: svgDataUri('About', '#0ea5e9') },
+  { id: 'skills', title: 'Skills', description: '', link: '#skills', image: svgDataUri('Skills', '#2f78ff') },
+  { id: 'projects', title: 'Projects', description: '', link: '#projects', image: svgDataUri('Projects', '#22c55e') },
+  { id: 'certifications', title: 'Certifications', description: '', link: '#certifications', image: svgDataUri('Certs', '#a855f7') },
+  { id: 'contact', title: 'Contact', description: '', link: '#contact', image: svgDataUri('Contact', '#f97316') },
+];

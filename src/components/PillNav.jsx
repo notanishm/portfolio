@@ -8,6 +8,7 @@ import './PillNav.css';
 const PillNav = ({
   items,
   activeHref,
+  onItemClick,
   className = '',
   ease = 'power3.easeOut',
   baseColor = '#0b1220',
@@ -197,7 +198,13 @@ const PillNav = ({
                     aria-label={item.ariaLabel || item.label}
                     onMouseEnter={() => handleEnter(i)}
                     onMouseLeave={() => handleLeave(i)}
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    onClick={(e) => {
+                      if (typeof onItemClick === 'function') {
+                        e.preventDefault();
+                        onItemClick(item);
+                      }
+                      setIsMobileMenuOpen(false);
+                    }}
                   >
                     <span
                       className="hover-circle"
@@ -246,7 +253,13 @@ const PillNav = ({
               <a
                 href={item.href}
                 className={`mobile-menu-link${activeHref === item.href ? ' is-active' : ''}`}
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={(e) => {
+                  if (typeof onItemClick === 'function') {
+                    e.preventDefault();
+                    onItemClick(item);
+                  }
+                  setIsMobileMenuOpen(false);
+                }}
               >
                 <span className="pill-label-row">
                   {item.icon ? <span className="pill-icon" aria-hidden="true">{item.icon}</span> : null}
