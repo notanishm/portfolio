@@ -32,8 +32,8 @@ function FlowingMenu({ onItemSelect, children }) {
         style={{
           position: 'fixed',
           top: '50%',
-          left: '40px',
-          transform: 'translateY(-50%)',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
           width: isExpanded ? '280px' : '80px',
           height: isExpanded ? `${menuItems.length * 64 + 140}px` : '80px',
           background: 'rgba(0, 0, 0, 0.6)',

@@ -192,24 +192,6 @@ function App() {
       <FlowingMenu onItemSelect={handleItemSelect}>
         {renderContent()}
       </FlowingMenu>
-
-      <div
-        style={{
-          position: 'fixed',
-          bottom: '40px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          textAlign: 'center',
-          color: '#fff',
-        }}
-      >
-        <h1 style={{ fontSize: '48px', fontWeight: 800, marginBottom: '8px', letterSpacing: '-0.02em' }}>
-          Anish Maisekar
-        </h1>
-        <p style={{ fontSize: '18px', opacity: 0.7 }}>
-          {personalInfo.title}
-        </p>
-      </div>
     </div>
   );
 }
