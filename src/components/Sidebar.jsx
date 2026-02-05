@@ -30,15 +30,15 @@ function Sidebar({ activeId, onItemClick }) {
             onClick={() => onItemClick(item.id)}
             className={`group relative flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-300 ${
               isActive 
-                ? 'bg-white/20' 
-                : 'hover:bg-white/10'
+                ? 'bg-black/10' 
+                : 'hover:bg-black/5'
             }`}
             title={item.label}
           >
-            <span className={`${isActive ? 'text-white' : 'text-white/60 group-hover:text-white'} transition-colors`}>
+            <span className={`${isActive ? 'text-black' : 'text-black/60 group-hover:text-black'} transition-colors`}>
               {Icon}
             </span>
-            <span className={`${isActive ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0'} text-sm font-medium text-white whitespace-nowrap transition-all duration-300`}>
+            <span className={`${isActive ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0'} text-sm font-medium text-black whitespace-nowrap transition-all duration-300`}>
               {item.label}
             </span>
           </button>

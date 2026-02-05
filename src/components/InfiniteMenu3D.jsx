@@ -1106,8 +1106,10 @@ class InfiniteGridMenu {
         this.setActiveIndex(itemIndex);
       }
       this.onActiveItemChange(itemIndex);
-      const snapDirection = vec3.normalize(vec3.create(), this.#getVertexWorldPosition(nearestVertexIndex));
-      this.control.snapTargetDirection = snapDirection;
+      if (!this.control.snapTargetDirection) {
+        const snapDirection = vec3.normalize(vec3.create(), this.#getVertexWorldPosition(nearestVertexIndex));
+        this.control.snapTargetDirection = snapDirection;
+      }
     } else {
       cameraTargetZ += this.control.rotationVelocity * 80 + 2.5;
       damping = 7 / timeScale;
@@ -1118,7 +1120,7 @@ class InfiniteGridMenu {
   }
 
   #findNearestVertexIndex() {
-    const n = this.control.snapDirection;
+    const n = this.control.isPointerDown ? this.control.snapDirection : (this.control.snapTargetDirection || this.control.snapDirection);
     const inversOrientation = quat.conjugate(quat.create(), this.control.orientation);
     const nt = vec3.transformQuat(vec3.create(), n, inversOrientation);
 
