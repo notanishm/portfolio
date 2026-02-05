@@ -363,6 +363,7 @@ function App() {
         className="arch-text"
         radius={80}
         scrambleChars=".:-_/\\"
+        soundFile="/yahoo.mp3"
       >
         I use Arch btw
       </ScrambledText>

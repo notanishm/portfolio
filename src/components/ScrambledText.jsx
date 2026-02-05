@@ -6,12 +6,15 @@ const ScrambledText = ({
   scrambleChars = '.:-_/\\',
   className = '',
   style = {},
+  onClick,
+  soundFile,
   children
 }) => {
   const rootRef = useRef(null);
   const [chars, setChars] = useState([]);
   const originalText = useRef(children.toString());
   const scrambleTimers = useRef({});
+  const audioRef = useRef(null);
 
   useEffect(() => {
     const text = originalText.current;
@@ -22,7 +25,12 @@ const ScrambledText = ({
       isScrambling: false
     }));
     setChars(charArray);
-  }, []);
+
+    // Initialize audio if soundFile is provided
+    if (soundFile) {
+      audioRef.current = new Audio(soundFile);
+    }
+  }, [soundFile]);
 
   const scrambleChar = (index) => {
     if (scrambleTimers.current[index]) {
@@ -73,12 +81,28 @@ const ScrambledText = ({
     });
   };
 
+  const handleClick = () => {
+    // Play sound if audio is available
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0; // Reset to start
+      audioRef.current.play().catch(err => {
+        console.error('Error playing audio:', err);
+      });
+    }
+
+    // Call custom onClick if provided
+    if (onClick) {
+      onClick();
+    }
+  };
+
   return (
     <div 
       ref={rootRef} 
       className={`text-block ${className}`} 
       style={style}
       onMouseMove={handleMouseMove}
+      onClick={handleClick}
     >
       <p>
         {chars.map((char, index) => (
