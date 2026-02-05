@@ -1,278 +1,164 @@
-import { useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
+import { gsap } from 'gsap';
 
-const menuItems = [
-  { id: 'about', label: 'About' },
-  { id: 'skills', label: 'Skills' },
-  { id: 'projects', label: 'Projects' },
-  { id: 'certifications', label: 'Certifications' },
-  { id: 'contact', label: 'Contact' },
-];
+import './FlowingMenu.css';
 
-function FlowingMenu({ onItemSelect, photoUrl, name, title, children }) {
-  const [activeItem, setActiveItem] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useState(null)[0];
+function FlowingMenu({
+  items = [],
+  speed = 15,
+  textColor = '#fff',
+  bgColor = '#060010',
+  marqueeBgColor = '#fff',
+  marqueeTextColor = '#060010',
+  borderColor = '#fff'
+}) {
+  return (
+    <div className="menu-wrap" style={{ backgroundColor: bgColor }}>
+      <nav className="menu">
+        {items.map((item, idx) => (
+          <MenuItem
+            key={idx}
+            {...item}
+            speed={speed}
+            textColor={textColor}
+            marqueeBgColor={marqueeBgColor}
+            marqueeTextColor={marqueeTextColor}
+            borderColor={borderColor}
+          />
+        ))}
+      </nav>
+    </div>
+  );
+}
 
-  const handleItemClick = (itemId) => {
-    setActiveItem(itemId);
-    onItemSelect?.(itemId);
+function MenuItem({ link, text, image, speed, textColor, marqueeBgColor, marqueeTextColor, borderColor }) {
+  const itemRef = useRef(null);
+  const marqueeRef = useRef(null);
+  const marqueeInnerRef = useRef(null);
+  const animationRef = useRef(null);
+  const [repetitions, setRepetitions] = useState(4);
+
+  const animationDefaults = { duration: 0.6, ease: 'expo' };
+
+  const findClosestEdge = (mouseX, mouseY, width, height) => {
+    const topEdgeDist = distMetric(mouseX, mouseY, width / 2, 0);
+    const bottomEdgeDist = distMetric(mouseX, mouseY, width / 2, height);
+    return topEdgeDist < bottomEdgeDist ? 'top' : 'bottom';
+  };
+
+  const distMetric = (x, y, x2, y2) => {
+    const xDiff = x - x2;
+    const yDiff = y - y2;
+    return xDiff * xDiff + yDiff * yDiff;
+  };
+
+  useEffect(() => {
+    const calculateRepetitions = () => {
+      if (!marqueeInnerRef.current) return;
+
+      // Get the first marquee part to measure content width
+      const marqueeContent = marqueeInnerRef.current.querySelector('.marquee__part');
+      if (!marqueeContent) return;
+
+      const contentWidth = marqueeContent.offsetWidth;
+      const viewportWidth = window.innerWidth;
+
+      // Calculate how many copies we need to fill viewport + extra for seamless loop
+      // We need at least 2, but calculate based on content vs viewport
+      const needed = Math.ceil(viewportWidth / contentWidth) + 2;
+      setRepetitions(Math.max(4, needed));
+    };
+
+    calculateRepetitions();
+    window.addEventListener('resize', calculateRepetitions);
+    return () => window.removeEventListener('resize', calculateRepetitions);
+  }, [text, image]);
+
+  useEffect(() => {
+    const setupMarquee = () => {
+      if (!marqueeInnerRef.current) return;
+
+      const marqueeContent = marqueeInnerRef.current.querySelector('.marquee__part');
+      if (!marqueeContent) return;
+
+      const contentWidth = marqueeContent.offsetWidth;
+      if (contentWidth === 0) return;
+
+      if (animationRef.current) {
+        animationRef.current.kill();
+      }
+
+      // Animate exactly one content width for seamless loop
+      animationRef.current = gsap.to(marqueeInnerRef.current, {
+        x: -contentWidth,
+        duration: speed,
+        ease: 'none',
+        repeat: -1
+      });
+    };
+
+    // Small delay to ensure DOM is ready after repetitions update
+    const timer = setTimeout(setupMarquee, 50);
+
+    return () => {
+      clearTimeout(timer);
+      if (animationRef.current) {
+        animationRef.current.kill();
+      }
+    };
+  }, [text, image, repetitions, speed]);
+
+  const handleMouseEnter = ev => {
+    if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return;
+    const rect = itemRef.current.getBoundingClientRect();
+    const x = ev.clientX - rect.left;
+    const y = ev.clientY - rect.top;
+    const edge = findClosestEdge(x, y, rect.width, rect.height);
+
+    gsap
+      .timeline({ defaults: animationDefaults })
+      .set(marqueeRef.current, { y: edge === 'top' ? '-101%' : '101%' }, 0)
+      .set(marqueeInnerRef.current, { y: edge === 'top' ? '101%' : '-101%' }, 0)
+      .to([marqueeRef.current, marqueeInnerRef.current], { y: '0%' }, 0);
+  };
+
+  const handleMouseLeave = ev => {
+    if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return;
+    const rect = itemRef.current.getBoundingClientRect();
+    const x = ev.clientX - rect.left;
+    const y = ev.clientY - rect.top;
+    const edge = findClosestEdge(x, y, rect.width, rect.height);
+
+    gsap
+      .timeline({ defaults: animationDefaults })
+      .to(marqueeRef.current, { y: edge === 'top' ? '-101%' : '101%' }, 0)
+      .to(marqueeInnerRef.current, { y: edge === 'top' ? '101%' : '-101%' }, 0);
   };
 
   return (
-    <>
-      <div className="sidebar" ref={menuRef}>
-        <div className="profile-section">
-          {photoUrl ? (
-            <img src={photoUrl} alt={name} className="profile-photo" />
-          ) : (
-            <div className="profile-placeholder">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-            </div>
-          )}
-          <div className="profile-info">
-            <h2 className="profile-name">{name || 'Your Name'}</h2>
-            <p className="profile-title">{title || 'Your Title'}</p>
+    <div className="menu__item cursor-target" ref={itemRef} style={{ borderColor }}>
+      <a
+        className="menu__item-link cursor-target"
+        href={link}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        style={{ color: textColor }}
+      >
+        {text}
+      </a>
+      <div className="marquee" ref={marqueeRef} style={{ backgroundColor: marqueeBgColor }}>
+        <div className="marquee__inner-wrap">
+          <div className="marquee__inner" ref={marqueeInnerRef} aria-hidden="true">
+            {[...Array(repetitions)].map((_, idx) => (
+              <div className="marquee__part" key={idx} style={{ color: marqueeTextColor }}>
+                <span>{text}</span>
+                <div className="marquee__img" style={{ backgroundImage: `url(${image})` }} />
+              </div>
+            ))}
           </div>
-        </div>
-
-        <button
-          className="menu-toggle cursor-target"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <span className="hamburger">
-            <span className="line" />
-            <span className="line" />
-            <span className="line" />
-          </span>
-        </button>
-
-        <div className={`menu-items ${isOpen ? 'open' : ''}`}>
-          {menuItems.map((item, index) => (
-            <button
-              key={item.id}
-              className={`menu-item cursor-target ${activeItem === item.id ? 'active' : ''}`}
-              onClick={() => handleItemClick(item.id)}
-              style={{
-                transitionDelay: isOpen ? `${index * 0.05}s` : '0s'
-              }}
-            >
-              {item.label}
-            </button>
-          ))}
         </div>
       </div>
-
-      {activeItem && (
-        <div className="content-area">
-          <div className="content-box">
-            <button className="close-btn cursor-target" onClick={() => setActiveItem(null)}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
-            </button>
-            {children}
-          </div>
-        </div>
-      )}
-
-      <style>{`
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-
-        .sidebar {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 280px;
-          height: 100vh;
-          background: #111;
-          padding: 24px;
-          z-index: 100;
-        }
-
-        .profile-section {
-          display: flex;
-          align-items: center;
-          gap: 14px;
-          padding-bottom: 24px;
-          border-bottom: 1px solid #333;
-          margin-bottom: 24px;
-        }
-
-        .profile-photo {
-          width: 52px;
-          height: 52px;
-          border-radius: 12px;
-          object-fit: cover;
-        }
-
-        .profile-placeholder {
-          width: 52px;
-          height: 52px;
-          border-radius: 12px;
-          background: #222;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #666;
-        }
-
-        .profile-name {
-          font-size: 15px;
-          font-weight: 700;
-          color: #fff;
-          margin-bottom: 4px;
-        }
-
-        .profile-title {
-          font-size: 12px;
-          color: #888;
-        }
-
-        .menu-toggle {
-          position: absolute;
-          top: 24px;
-          right: -52px;
-          width: 44px;
-          height: 44px;
-          background: #111;
-          border: 1px solid #333;
-          border-radius: 10px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.2s ease;
-        }
-
-        .menu-toggle:hover {
-          background: #1a1a1a;
-          border-color: #444;
-          transform: scale(1.05);
-        }
-
-        .hamburger {
-          display: flex;
-          flex-direction: column;
-          gap: 5px;
-        }
-
-        .line {
-          width: 18px;
-          height: 2px;
-          background: #fff;
-        }
-
-        .menu-items {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          opacity: 0;
-          pointer-events: none;
-          transition: opacity 0.3s ease;
-        }
-
-        .menu-items.open {
-          opacity: 1;
-          pointer-events: auto;
-        }
-
-        .menu-items.open .menu-item {
-          animation: slideIn 0.3s ease forwards;
-        }
-
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateX(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        .menu-item {
-          padding: 14px 16px;
-          background: #1a1a1a;
-          border: 1px solid #333;
-          border-radius: 10px;
-          cursor: pointer;
-          color: #ccc;
-          font-size: 14px;
-          font-weight: 500;
-          text-align: left;
-          transition: all 0.2s ease;
-          transform: translateX(0);
-        }
-
-        .menu-item:hover {
-          background: #252525;
-          border-color: #555;
-          color: #fff;
-          transform: translateX(4px);
-        }
-
-        .menu-item.active {
-          background: #fff;
-          border-color: #fff;
-          color: #000;
-        }
-
-        .content-area {
-          position: fixed;
-          top: 0;
-          left: 280px;
-          right: 0;
-          bottom: 0;
-          padding: 40px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #0a0a0a;
-        }
-
-        .content-box {
-          width: 100%;
-          max-width: 600px;
-          background: #111;
-          border: 1px solid #333;
-          border-radius: 16px;
-          padding: 32px;
-          position: relative;
-        }
-
-        .close-btn {
-          position: absolute;
-          top: 16px;
-          right: 16px;
-          width: 36px;
-          height: 36px;
-          background: #1a1a1a;
-          border: 1px solid #333;
-          border-radius: 8px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #888;
-          transition: all 0.2s ease;
-        }
-
-        .close-btn:hover {
-          background: #252525;
-          border-color: #444;
-          color: #fff;
-          transform: rotate(90deg);
-        }
-      `}</style>
-    </>
+    </div>
   );
 }
 
