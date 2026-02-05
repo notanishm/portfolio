@@ -159,34 +159,164 @@ export const navigationItems = [
   { id: 'contact', label: 'Contact', icon: 'Mail' },
 ];
 
-const svgDataUri = (label, accent = '#2f78ff') => {
+const wrapWords = (text, maxChars) => {
+  const words = String(text || '').replace(/\s+/g, ' ').trim().split(' ');
+  const lines = [];
+  let line = '';
+  for (const w of words) {
+    const next = line ? `${line} ${w}` : w;
+    if (next.length > maxChars) {
+      if (line) lines.push(line);
+      line = w;
+    } else {
+      line = next;
+    }
+  }
+  if (line) lines.push(line);
+  return lines;
+};
+
+const svgCardDataUri = ({ title, lines, accent = '#2f78ff' }) => {
+  const safeLines = (lines || []).map((l) => String(l)).filter(Boolean);
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const titleEsc = esc(title);
+  const tspans = safeLines
+    .slice(0, 9)
+    .map((l, i) => `<tspan x="72" dy="${i === 0 ? 0 : 44}">${esc(l)}</tspan>`)
+    .join('');
+
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="${accent}" stop-opacity="0.95"/>
+      <stop offset="0" stop-color="${accent}" stop-opacity="0.92"/>
       <stop offset="1" stop-color="#0b1220" stop-opacity="1"/>
     </linearGradient>
-    <radialGradient id="r" cx="50%" cy="35%" r="70%">
-      <stop offset="0" stop-color="#ffffff" stop-opacity="0.12"/>
+    <radialGradient id="r" cx="50%" cy="25%" r="75%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.14"/>
       <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
     </radialGradient>
+    <filter id="blur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="18" />
+    </filter>
   </defs>
-  <rect width="900" height="900" fill="url(#g)"/>
-  <rect width="900" height="900" fill="url(#r)"/>
-  <g fill="#ffffff" fill-opacity="0.92" font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto" text-anchor="middle">
-    <text x="450" y="470" font-size="84" font-weight="800" letter-spacing="1">${label}</text>
+
+  <rect width="900" height="900" rx="72" fill="url(#g)"/>
+  <rect width="900" height="900" rx="72" fill="url(#r)"/>
+
+  <circle cx="150" cy="140" r="92" fill="#ffffff" fill-opacity="0.06" filter="url(#blur)" />
+  <circle cx="720" cy="730" r="150" fill="#ffffff" fill-opacity="0.05" filter="url(#blur)" />
+
+  <g font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto" fill="#ffffff">
+    <text x="72" y="120" font-size="56" font-weight="900" letter-spacing="-0.5">${titleEsc}</text>
+    <rect x="72" y="150" width="756" height="2" fill="#ffffff" fill-opacity="0.22" />
+    <text x="72" y="230" font-size="30" font-weight="600" fill-opacity="0.9">
+      ${tspans}
+    </text>
   </g>
 </svg>`;
+
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 };
 
-// Items used by the ReactBits Infinite Menu (3D). Keep these titles generic and resume-safe.
+const clampLines = (arr, max) => (arr || []).filter(Boolean).slice(0, max);
+
+const skillsLine = (label, list, maxItems) => {
+  const items = (list || []).map((x) => x.name).filter(Boolean);
+  const shown = items.slice(0, maxItems).join(', ');
+  const suffix = items.length > maxItems ? ', ...' : '';
+  return `${label}: ${shown}${suffix}`;
+};
+
+// Items used by the ReactBits Infinite Menu (3D). Each disc image contains the section content.
 export const menu3dItems = [
-  { id: 'home', title: 'Home', description: '', link: '#home', image: '/profile-photo.jpg' },
-  { id: 'about', title: 'About', description: '', link: '#about', image: svgDataUri('About', '#0ea5e9') },
-  { id: 'skills', title: 'Skills', description: '', link: '#skills', image: svgDataUri('Skills', '#2f78ff') },
-  { id: 'projects', title: 'Projects', description: '', link: '#projects', image: svgDataUri('Projects', '#22c55e') },
-  { id: 'certifications', title: 'Certifications', description: '', link: '#certifications', image: svgDataUri('Certs', '#a855f7') },
-  { id: 'contact', title: 'Contact', description: '', link: '#contact', image: svgDataUri('Contact', '#f97316') },
+  {
+    id: 'home',
+    title: 'Home',
+    description: '',
+    link: '#',
+    // Use the provided photo on one disc.
+    image: '/profile-photo.jpg',
+  },
+  {
+    id: 'about',
+    title: 'About',
+    description: '',
+    link: '#',
+    image: svgCardDataUri({
+      title: 'Professional Summary',
+      accent: '#0ea5e9',
+      lines: [
+        ...clampLines(wrapWords(personalInfo.summary, 36), 6),
+        '',
+        'Education',
+        `${education[1].degree} | ${education[1].period}`,
+        education[1].institution,
+        `${education[0].degree} | ${education[0].period}`,
+      ],
+    }),
+  },
+  {
+    id: 'skills',
+    title: 'Skills',
+    description: '',
+    link: '#',
+    image: svgCardDataUri({
+      title: 'Technical Skills',
+      accent: '#2f78ff',
+      lines: [
+        skillsLine('Languages', skills.languages, 6),
+        skillsLine('Frameworks', skills.frameworks, 6),
+        skillsLine('Security', skills.security, 6),
+        skillsLine('Tools', skills.tools, 6),
+      ],
+    }),
+  },
+  {
+    id: 'projects',
+    title: 'Projects',
+    description: '',
+    link: '#',
+    image: svgCardDataUri({
+      title: 'Encrypted Communication Platform',
+      accent: '#22c55e',
+      lines: clampLines(projects[0]?.features || [], 9),
+    }),
+  },
+  {
+    id: 'certifications',
+    title: 'Certifications',
+    description: '',
+    link: '#',
+    image: svgCardDataUri({
+      title: 'Certifications',
+      accent: '#a855f7',
+      lines: [
+        `${certifications[0].title} (${certifications[0].date})`,
+        ...clampLines(certifications[0].bullets, 4),
+        `${certifications[1].title} (${certifications[1].date})`,
+        ...clampLines(certifications[1].bullets, 2),
+        `${certifications[2].title} (${certifications[2].date})`,
+        ...clampLines(certifications[2].bullets, 2),
+      ],
+    }),
+  },
+  {
+    id: 'contact',
+    title: 'Contact',
+    description: '',
+    link: '#',
+    image: svgCardDataUri({
+      title: 'Contact',
+      accent: '#f97316',
+      lines: [
+        personalInfo.name,
+        personalInfo.email,
+        personalInfo.phone,
+        personalInfo.location,
+        personalInfo.linkedin.replace('https://', ''),
+        personalInfo.github.replace('https://', ''),
+      ],
+    }),
+  },
 ];

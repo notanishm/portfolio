@@ -911,7 +911,14 @@ class InfiniteGridMenu {
 const fallbackItems = [{ image: 'https://picsum.photos/900/900?grayscale', link: '#', title: 'Menu', description: '' }];
 
 const InfiniteMenu3D = forwardRef(function InfiniteMenu3D(
-  { items = [], scale = 1, onActiveItemChange, onMovementChange, onSelect },
+  {
+    items = [],
+    scale = 1,
+    onActiveItemChange,
+    onMovementChange,
+    onSelect,
+    showOverlay = true,
+  },
   ref,
 ) {
   const canvasRef = useRef(null);
@@ -968,24 +975,28 @@ const InfiniteMenu3D = forwardRef(function InfiniteMenu3D(
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <canvas id="infinite-menu-3d-canvas" ref={canvasRef} />
-      <div className="infinite-menu-3d-overlay">
-        {activeItem ? (
-          <>
-            <h2 className={`infinite-menu-3d-title ${isMoving ? 'inactive' : 'active'}`}>{activeItem.title || ''}</h2>
-            {activeItem.description ? (
-              <p className={`infinite-menu-3d-description ${isMoving ? 'inactive' : 'active'}`}>{activeItem.description}</p>
-            ) : null}
-            <button
-              type="button"
-              onClick={handleSelect}
-              className={`infinite-menu-3d-action ${isMoving ? 'inactive' : 'active'}`}
-              aria-label="Go to section"
-            >
-              <span aria-hidden="true">↗</span>
-            </button>
-          </>
-        ) : null}
-      </div>
+      {showOverlay ? (
+        <div className="infinite-menu-3d-overlay">
+          {activeItem ? (
+            <>
+              <h2 className={`infinite-menu-3d-title ${isMoving ? 'inactive' : 'active'}`}>{activeItem.title || ''}</h2>
+              {activeItem.description ? (
+                <p className={`infinite-menu-3d-description ${isMoving ? 'inactive' : 'active'}`}>{activeItem.description}</p>
+              ) : null}
+              {onSelect ? (
+                <button
+                  type="button"
+                  onClick={handleSelect}
+                  className={`infinite-menu-3d-action ${isMoving ? 'inactive' : 'active'}`}
+                  aria-label="Select"
+                >
+                  <span aria-hidden="true">↗</span>
+                </button>
+              ) : null}
+            </>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 });
