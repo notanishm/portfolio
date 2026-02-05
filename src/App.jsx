@@ -178,11 +178,23 @@ function ContactContent() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '500px' }}>
         <div style={{ padding: '16px', background: '#1a1a1a', borderRadius: '12px' }}>
           <div style={{ fontSize: '12px', color: '#fff', marginBottom: '6px' }}>Email</div>
-          <div style={{ fontSize: '16px' }}>{personalInfo.email}</div>
+          <a 
+            href={`mailto:${personalInfo.email}`}
+            className="cursor-target"
+            style={{ fontSize: '16px', color: '#fff', textDecoration: 'none' }}
+          >
+            {personalInfo.email}
+          </a>
         </div>
         <div style={{ padding: '16px', background: '#1a1a1a', borderRadius: '12px' }}>
           <div style={{ fontSize: '12px', color: '#fff', marginBottom: '6px' }}>Phone</div>
-          <div style={{ fontSize: '16px' }}>{personalInfo.phone}</div>
+          <a 
+            href={`tel:${personalInfo.phone}`}
+            className="cursor-target"
+            style={{ fontSize: '16px', color: '#fff', textDecoration: 'none' }}
+          >
+            {personalInfo.phone}
+          </a>
         </div>
         <div style={{ padding: '16px', background: '#1a1a1a', borderRadius: '12px' }}>
           <div style={{ fontSize: '12px', color: '#fff', marginBottom: '6px' }}>Location</div>
@@ -190,11 +202,27 @@ function ContactContent() {
         </div>
         <div style={{ padding: '16px', background: '#1a1a1a', borderRadius: '12px' }}>
           <div style={{ fontSize: '12px', color: '#fff', marginBottom: '6px' }}>LinkedIn</div>
-          <div style={{ fontSize: '16px' }}>{personalInfo.linkedin.replace('https://', '')}</div>
+          <a 
+            href={personalInfo.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cursor-target"
+            style={{ fontSize: '16px', color: '#fff', textDecoration: 'none' }}
+          >
+            {personalInfo.linkedin.replace('https://', '')}
+          </a>
         </div>
         <div style={{ padding: '16px', background: '#1a1a1a', borderRadius: '12px' }}>
           <div style={{ fontSize: '12px', color: '#fff', marginBottom: '6px' }}>GitHub</div>
-          <div style={{ fontSize: '16px' }}>{personalInfo.github.replace('https://', '')}</div>
+          <a 
+            href={personalInfo.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cursor-target"
+            style={{ fontSize: '16px', color: '#fff', textDecoration: 'none' }}
+          >
+            {personalInfo.github.replace('https://', '')}
+          </a>
         </div>
       </div>
     </div>
