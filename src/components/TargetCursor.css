@@ -10,6 +10,13 @@
   transform: translate(-50%, -50%);
 }
 
+/* Hide cursor on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .target-cursor-wrapper {
+    display: none;
+  }
+}
+
 .target-cursor-dot {
   position: absolute;
   left: 50%;
@@ -55,3 +62,4 @@
   border-right: none;
   border-top: none;
 }
+
