@@ -1,115 +1,23 @@
-/* Desktop menu - hide on mobile */
-.desktop-menu {
-  display: block;
-}
-
-@media (max-width: 768px) {
-  .desktop-menu {
-    display: none;
-  }
-}
-
 /* Base responsive styles */
 .content-wrapper {
   transition: padding 0.3s ease, max-width 0.3s ease;
-  position: relative;
-  z-index: 5;
 }
 
-/* Ensure content is visible on mobile */
-@media (max-width: 768px) {
-  .content-wrapper {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
+/* Responsive flex gaps */
+.about-header {
+  transition: flex-direction 0.3s ease, align-items 0.3s ease;
 }
 
-/* Extra small devices (phones, portrait) */
-@media (max-width: 480px) {
-  .content-wrapper {
-    height: 100vh !important;
-    padding: 80px 16px 16px 16px !important;
-    margin-top: 0 !important;
-  }
-
-  .about-header {
-    flex-direction: column !important;
-    align-items: center !important;
-    text-align: center;
-    gap: 16px !important;
-  }
-
-  .about-header img {
-    width: 120px !important;
-    height: 120px !important;
-  }
-
-  h1 {
-    font-size: 20px !important;
-  }
-
-  h2 {
-    font-size: 18px !important;
-  }
-
-  h3 {
-    font-size: 11px !important;
-  }
-
-  p {
-    font-size: 13px !important;
-  }
-
-  .mobile-menu-item {
-    font-size: 20px !important;
-    min-width: 150px !important;
-    padding: 12px 24px !important;
-  }
+/* Fluid image scaling */
+.about-header img {
+  transition: width 0.3s ease, height 0.3s ease;
 }
 
-/* Small devices (phones, landscape and small tablets) */
-@media (min-width: 481px) and (max-width: 768px) {
+/* Tablet and smaller screens */
+@media (max-width: 1024px) {
   .content-wrapper {
-    height: 100vh !important;
-    padding: 80px 20px 20px 20px !important;
-    margin-top: 0 !important;
-    max-width: 100% !important;
-  }
-
-  .about-header {
-    flex-direction: column !important;
-    align-items: center !important;
-    text-align: center;
-    gap: 20px !important;
-  }
-
-  .about-header img {
-    width: 140px !important;
-    height: 140px !important;
-  }
-
-  h1 {
-    font-size: 24px !important;
-  }
-
-  h2 {
-    font-size: 20px !important;
-  }
-
-  h3 {
-    font-size: 12px !important;
-  }
-
-  p {
-    font-size: 14px !important;
-  }
-}
-
-/* Medium devices (tablets) */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .content-wrapper {
-    padding: 28px !important;
-    max-width: 680px !important;
+    padding: 30px !important;
+    max-width: 700px !important;
   }
 
   h1 {
@@ -121,20 +29,8 @@
   }
 }
 
-/* Large tablets and small laptops */
-@media (min-width: 1025px) and (max-width: 1280px) {
-  .content-wrapper {
-    padding: 35px !important;
-    max-width: 800px !important;
-  }
-
-  h1 {
-    font-size: 30px !important;
-  }
-}
-
 /* Standard laptops and desktops */
-@media (min-width: 1281px) and (max-width: 1600px) {
+@media (min-width: 1025px) and (max-width: 1600px) {
   .content-wrapper {
     padding: 40px !important;
     max-width: 900px !important;
@@ -148,51 +44,3 @@
     max-width: 1000px !important;
   }
 }
-
-/* Responsive menu height adjustments */
-@media (max-width: 768px) {
-  .content-wrapper {
-    height: 100vh !important;
-  }
-}
-
-@media (min-width: 769px) {
-  .content-wrapper {
-    height: calc(100vh - 50px) !important;
-  }
-}
-
-/* Fluid image scaling */
-.about-header img {
-  transition: width 0.3s ease, height 0.3s ease;
-}
-
-/* Responsive flex gaps */
-@media (max-width: 768px) {
-  .about-header {
-    gap: 20px !important;
-  }
-}
-
-/* Contact cards mobile */
-@media (max-width: 768px) {
-  .contact-card {
-    padding: 12px !important;
-  }
-}
-
-/* Skills tags responsive */
-@media (max-width: 480px) {
-  .skill-tag {
-    font-size: 11px !important;
-    padding: 5px 10px !important;
-  }
-}
-
-@media (min-width: 481px) and (max-width: 768px) {
-  .skill-tag {
-    font-size: 12px !important;
-    padding: 6px 12px !important;
-  }
-}
-

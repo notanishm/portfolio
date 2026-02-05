@@ -2,7 +2,6 @@ import { useState } from 'react';
 import Dither from './components/Dither';
 import TargetCursor from './components/TargetCursor';
 import FlowingMenu from './components/FlowingMenu';
-import MobileMenu from './components/MobileMenu';
 import { personalInfo, skills, education, projects, certifications } from './data/content';
 import './App.css';
 
@@ -322,13 +321,12 @@ function App() {
         />
       </div>
       
-      {/* Desktop Menu */}
+      {/* Menu */}
       <div 
         style={{ 
           position: 'relative', 
           zIndex: 10
         }}
-        className="desktop-menu"
       >
         <FlowingMenu 
           items={menuItems}
@@ -342,15 +340,8 @@ function App() {
         />
       </div>
 
-      {/* Mobile Menu */}
-      <MobileMenu 
-        items={menuItems}
-        onItemClick={setActiveSection}
-        activeSection={activeSection}
-      />
-
       {/* Content */}
-      <div 
+      <div
         className="content-wrapper"
         style={{ 
           position: 'relative',
