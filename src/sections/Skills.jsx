@@ -6,6 +6,8 @@ const SkillBar = ({ skill, index }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-50px' });
 
+  const hasLevel = typeof skill.level === 'number' && Number.isFinite(skill.level);
+
   return (
     <motion.div
       ref={ref}
@@ -14,28 +16,37 @@ const SkillBar = ({ skill, index }) => {
       transition={{ delay: index * 0.1 }}
       className="mb-4"
     >
-      <div className="flex justify-between mb-2">
-        <span className="text-gray-700 dark:text-gray-300 font-medium">
-          {skill.name}
-        </span>
-        <span className="text-gray-500 dark:text-gray-400 text-sm">
-          {skill.level}%
-        </span>
-      </div>
-      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-        <motion.div
-          className="h-full bg-gradient-to-r from-primary-500 to-cyber-500 rounded-full"
-          initial={{ width: 0 }}
-          animate={isInView ? { width: `${skill.level}%` } : {}}
-          transition={{ duration: 1, delay: index * 0.1, ease: 'easeOut' }}
-        />
-      </div>
+      {hasLevel ? (
+        <>
+          <div className="flex justify-between mb-2">
+            <span className="text-gray-700 dark:text-gray-300 font-medium">{skill.name}</span>
+            <span className="text-gray-500 dark:text-gray-400 text-sm">{skill.level}%</span>
+          </div>
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-gradient-to-r from-primary-500 to-cyber-500 rounded-full"
+              initial={{ width: 0 }}
+              animate={isInView ? { width: `${skill.level}%` } : {}}
+              transition={{ duration: 1, delay: index * 0.1, ease: 'easeOut' }}
+            />
+          </div>
+        </>
+      ) : (
+        <div className="flex items-center gap-3">
+          <span className="w-2 h-2 rounded-full bg-primary-500" aria-hidden="true" />
+          <span className="text-gray-700 dark:text-gray-300 font-medium">{skill.name}</span>
+        </div>
+      )}
     </motion.div>
   );
 };
 
 const Skills = () => {
   const [activeTab, setActiveTab] = useState('languages');
+
+  const hasAnySkills = Object.values(skills).some(
+    (list) => Array.isArray(list) && list.length > 0,
+  );
 
   const tabs = [
     { id: 'languages', label: 'Languages' },
@@ -66,50 +77,67 @@ const Skills = () => {
           </p>
         </motion.div>
 
-        {/* Tabs */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12">
-          {tabs.map((tab) => (
-            <motion.button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-6 py-3 rounded-full font-medium transition-all ${
-                activeTab === tab.id
-                  ? 'bg-gradient-to-r from-primary-600 to-cyber-600 text-white shadow-lg'
-                  : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {tab.label}
-            </motion.button>
-          ))}
-        </div>
+        {!hasAnySkills ? (
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg text-center">
+              <p className="text-gray-600 dark:text-gray-300">
+                Skills content will appear here once you add your resume-backed skills to
+                <span className="font-mono"> src/data/content.js</span>.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Tabs */}
+            <div className="flex flex-wrap justify-center gap-2 mb-12">
+              {tabs.map((tab) => (
+                <motion.button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-6 py-3 rounded-full font-medium transition-all ${
+                    activeTab === tab.id
+                      ? 'bg-gradient-to-r from-primary-600 to-cyber-600 text-white shadow-lg'
+                      : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
+                  }`}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {tab.label}
+                </motion.button>
+              ))}
+            </div>
 
-        {/* Skills Content */}
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Left - Skill Bars */}
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg"
-          >
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              {tabs.find((t) => t.id === activeTab)?.label} Proficiency
-            </h3>
-            {skills[activeTab].map((skill, index) => (
-              <SkillBar key={skill.name} skill={skill} index={index} />
-            ))}
-          </motion.div>
+            {/* Skills Content */}
+            <div className="grid lg:grid-cols-2 gap-12">
+              {/* Left - Skill Bars */}
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg"
+              >
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+                  {tabs.find((t) => t.id === activeTab)?.label}
+                </h3>
+                {skills[activeTab].length > 0 ? (
+                  skills[activeTab].map((skill, index) => (
+                    <SkillBar key={skill.name} skill={skill} index={index} />
+                  ))
+                ) : (
+                  <p className="text-gray-600 dark:text-gray-400">
+                    No items added for this category yet.
+                  </p>
+                )}
+              </motion.div>
 
-          {/* Right - Visual Representation */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="relative"
-          >
+              {/* Right - Visual Representation */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="relative"
+              >
             {/* Circular Progress */}
             <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
@@ -118,9 +146,12 @@ const Skills = () => {
               
               <div className="grid grid-cols-2 gap-6">
                 {Object.entries(skills).map(([category, skillList]) => {
-                  const average = Math.round(
-                    skillList.reduce((acc, skill) => acc + skill.level, 0) / skillList.length
-                  );
+                  const levels = skillList
+                    .map((s) => (typeof s.level === 'number' && Number.isFinite(s.level) ? s.level : null))
+                    .filter((v) => v !== null);
+                  const average = levels.length
+                    ? Math.round(levels.reduce((acc, v) => acc + v, 0) / levels.length)
+                    : null;
                   
                   return (
                     <motion.div
@@ -151,7 +182,7 @@ const Skills = () => {
                               activeTab === category ? 'text-cyber-500' : ''
                             }`}
                             initial={{ pathLength: 0 }}
-                            whileInView={{ pathLength: average / 100 }}
+                            whileInView={{ pathLength: average ? average / 100 : 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 1.5, ease: 'easeOut' }}
                             style={{
@@ -161,7 +192,7 @@ const Skills = () => {
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
                           <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                            {average}%
+                            {average ? `${average}%` : '--'}
                           </span>
                         </div>
                       </div>
@@ -206,8 +237,10 @@ const Skills = () => {
                   ))}
               </div>
             </div>
-          </motion.div>
-        </div>
+              </motion.div>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );

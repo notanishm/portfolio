@@ -1,7 +1,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { MapPin, Mail, Phone, GraduationCap, Award, BookOpen } from 'lucide-react';
-import { personalInfo, education } from '../data/content';
+import { personalInfo, education, certifications, projects } from '../data/content';
 
 const About = () => {
   const ref = useRef(null);
@@ -53,26 +53,39 @@ const About = () => {
               variants={itemVariants}
               className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6"
             >
-              Professional Summary
+              {personalInfo.summary ? 'Professional Summary' : 'Information'}
             </motion.h3>
 
-            <motion.p
+            <motion.div
               variants={itemVariants}
-              className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed mb-8"
+              className="flex items-center gap-5 p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 mb-8"
             >
-              Results-driven Full Stack Developer with expertise in building secure, scalable web applications. 
-              Specialized in encryption technologies, API security, and modern web development frameworks. 
-              Passionate about creating robust solutions that prioritize both functionality and security.
-            </motion.p>
+              <div className="w-16 h-16 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 flex-shrink-0">
+                <img
+                  src="/profile-photo.jpg"
+                  alt={personalInfo.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = 'https://via.placeholder.com/256x256/2f78ff/ffffff?text=AM';
+                  }}
+                />
+              </div>
+              <div>
+                <div className="text-lg font-bold text-gray-900 dark:text-white">{personalInfo.name}</div>
+                <div className="text-gray-600 dark:text-gray-400">
+                  {personalInfo.location}
+                </div>
+              </div>
+            </motion.div>
 
-            <motion.p
-              variants={itemVariants}
-              className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed mb-8"
-            >
-              Experienced in implementing end-to-end encryption systems and secure communication protocols. 
-              Committed to staying current with the latest security best practices and emerging technologies 
-              to deliver cutting-edge solutions for complex problems.
-            </motion.p>
+            {personalInfo.summary ? (
+              <motion.p
+                variants={itemVariants}
+                className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed mb-8"
+              >
+                {personalInfo.summary}
+              </motion.p>
+            ) : null}
 
             {/* Contact Info Grid */}
             <motion.div
@@ -137,57 +150,63 @@ const About = () => {
               Education
             </motion.h3>
 
-            <motion.div
-              variants={itemVariants}
-              className="bg-gradient-to-br from-primary-50 to-cyber-50 dark:from-gray-800 dark:to-gray-800 rounded-2xl p-8 mb-8"
-            >
-              <div className="flex items-start gap-4 mb-6">
-                <div className="p-3 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
-                  <GraduationCap size={24} />
-                </div>
-                <div>
-                  <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
-                    {education.degree}
-                  </h4>
-                  <p className="text-primary-600 dark:text-primary-400 font-medium">
-                    {education.institution}
-                  </p>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">
-                    {education.location} • {education.period}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-400 mt-2">
-                    GPA: {education.gpa}
-                  </p>
-                </div>
-              </div>
+            <motion.div variants={itemVariants} className="space-y-6 mb-8">
+              {education.map((edu, idx) => (
+                <div
+                  key={`${edu.institution}-${idx}`}
+                  className="bg-gradient-to-br from-primary-50 to-cyber-50 dark:from-gray-800 dark:to-gray-800 rounded-2xl p-8"
+                >
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="p-3 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
+                      <GraduationCap size={24} />
+                    </div>
+                    <div>
+                      {edu.degree ? (
+                        <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{edu.degree}</h4>
+                      ) : null}
+                      <p className="text-primary-600 dark:text-primary-400 font-medium">{edu.institution}</p>
+                      {(edu.location || edu.period) ? (
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">
+                          {[edu.location, edu.period].filter(Boolean).join(' • ')}
+                        </p>
+                      ) : null}
+                      {edu.score ? (
+                        <p className="text-gray-600 dark:text-gray-400 mt-2">{edu.score}</p>
+                      ) : null}
+                    </div>
+                  </div>
 
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
-                  <BookOpen size={16} />
-                  Relevant Coursework
-                </h5>
-                <div className="flex flex-wrap gap-2">
-                  {education.relevantCourses.map((course, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-full border border-gray-200 dark:border-gray-600"
-                    >
-                      {course}
-                    </span>
-                  ))}
+                  {Array.isArray(edu.relevantCourses) && edu.relevantCourses.length > 0 ? (
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                      <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+                        <BookOpen size={16} />
+                        Relevant Coursework
+                      </h5>
+                      <div className="flex flex-wrap gap-2">
+                        {edu.relevantCourses.map((course, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-full border border-gray-200 dark:border-gray-600"
+                          >
+                            {course}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
-              </div>
+              ))}
             </motion.div>
 
-            {/* Quick Stats */}
+            {/* Quick Stats (derived from provided data) */}
             <motion.div
               variants={itemVariants}
               className="grid grid-cols-3 gap-4"
             >
               {[
-                { icon: Award, value: '4+', label: 'Certifications' },
-                { icon: BookOpen, value: '10+', label: 'Projects' },
-                { icon: GraduationCap, value: education.gpa, label: 'GPA' },
+                { icon: Award, value: `${certifications.length}`, label: 'Certifications' },
+                { icon: BookOpen, value: `${projects.length}`, label: 'Projects' },
+                { icon: GraduationCap, value: `${education.length}`, label: 'Education' },
               ].map((stat, index) => (
                 <motion.div
                   key={index}

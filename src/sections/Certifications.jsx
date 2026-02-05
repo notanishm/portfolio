@@ -1,13 +1,12 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { Award, Calendar, ExternalLink, Shield, Server, Layout, Lock } from 'lucide-react';
+import { Award, Calendar, ExternalLink, Shield, Server, Layout } from 'lucide-react';
 import { certifications } from '../data/content';
 
 const certificationIcons = {
-  'Security & Compliance Certification': Shield,
+  'Security & Compliance': Shield,
   'Backend Development & API Security': Server,
-  'Frontend Development Specialization': Layout,
-  'Web Application Security': Lock,
+  'Frontend Development': Layout,
 };
 
 const CertificationCard = ({ cert, index }) => {
@@ -41,32 +40,45 @@ const CertificationCard = ({ cert, index }) => {
         <div className="relative">
           <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
             <Calendar size={14} />
-            {cert.date}
+            {cert.date || ' '}
           </div>
           
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
             {cert.title}
           </h3>
           
-          <p className="text-primary-600 dark:text-primary-400 font-medium mb-3">
-            {cert.issuer}
-          </p>
+          {cert.issuer ? (
+            <p className="text-primary-600 dark:text-primary-400 font-medium mb-3">{cert.issuer}</p>
+          ) : null}
           
-          <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-4">
-            {cert.description}
-          </p>
+          {cert.description ? (
+            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-4">{cert.description}</p>
+          ) : null}
+
+          {Array.isArray(cert.bullets) && cert.bullets.length > 0 ? (
+            <ul className="space-y-2 mb-4">
+              {cert.bullets.map((b, idx) => (
+                <li key={idx} className="text-sm text-gray-600 dark:text-gray-300 flex gap-2">
+                  <span className="mt-2 w-1.5 h-1.5 rounded-full bg-primary-500 flex-shrink-0" aria-hidden="true" />
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
 
           {/* Skills */}
-          <div className="flex flex-wrap gap-2">
-            {cert.skills.map((skill, idx) => (
-              <span
-                key={idx}
-                className="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 text-xs font-medium rounded-full"
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
+          {Array.isArray(cert.skills) && cert.skills.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {cert.skills.map((skill, idx) => (
+                <span
+                  key={idx}
+                  className="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 text-xs font-medium rounded-full"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          ) : null}
 
           {/* Link if available */}
           {cert.link && (
@@ -117,33 +129,7 @@ const Certifications = () => {
           ))}
         </div>
 
-        {/* Stats Row */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6"
-        >
-          {[
-            { value: '4+', label: 'Certifications' },
-            { value: '200+', label: 'Hours of Training' },
-            { value: '100%', label: 'Completion Rate' },
-            { value: 'Top 5%', label: 'Performance' },
-          ].map((stat, index) => (
-            <motion.div
-              key={index}
-              className="text-center p-6 bg-white dark:bg-gray-700 rounded-2xl shadow-md"
-              whileHover={{ y: -5 }}
-            >
-              <div className="text-3xl sm:text-4xl font-bold gradient-text mb-2">
-                {stat.value}
-              </div>
-              <div className="text-gray-600 dark:text-gray-300 text-sm">
-                {stat.label}
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+        {/* Stats removed (resume-only data policy) */}
       </div>
     </section>
   );

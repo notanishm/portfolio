@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
-import InfiniteMenu from './components/InfiniteMenu';
+import { Home, User, Code, Folder, Award, Mail } from 'lucide-react';
+import PillNav from './components/PillNav';
 import ThemeToggle from './components/ThemeToggle';
 import Hero from './sections/Hero';
 import About from './sections/About';
@@ -13,6 +14,23 @@ import { navigationItems } from './data/content';
 
 function App() {
   const [activeSection, setActiveSection] = useState('home');
+
+  const navItems = useMemo(() => {
+    const iconMap = {
+      Home: <Home size={18} />,
+      User: <User size={18} />,
+      Code: <Code size={18} />,
+      Folder: <Folder size={18} />,
+      Award: <Award size={18} />,
+      Mail: <Mail size={18} />,
+    };
+
+    return navigationItems.map((item) => ({
+      ...item,
+      href: `#${item.id}`,
+      icon: iconMap[item.icon] ?? null,
+    }));
+  }, []);
 
   // Scroll to section handler
   const scrollToSection = (sectionId) => {
@@ -50,10 +68,14 @@ function App() {
     <ThemeProvider>
       <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
         {/* Navigation */}
-        <InfiniteMenu
-          items={navigationItems}
-          activeSection={activeSection}
-          onNavigate={scrollToSection}
+        <PillNav
+          items={navItems}
+          activeHref={`#${activeSection}`}
+          className=""
+          baseColor="#0b1220"
+          pillColor="#111a2f"
+          hoveredPillTextColor="#0b1220"
+          pillTextColor="#e5e7eb"
         />
 
         {/* Main Content */}

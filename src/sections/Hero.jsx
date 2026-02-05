@@ -70,23 +70,27 @@ const Hero = () => {
               <span className="gradient-text">{personalInfo.name}</span>
             </motion.h1>
 
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="text-xl sm:text-2xl lg:text-3xl text-gray-600 dark:text-gray-300 mb-6 font-light"
-            >
-              {personalInfo.title}
-            </motion.h2>
+            {personalInfo.title ? (
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="text-xl sm:text-2xl lg:text-3xl text-gray-600 dark:text-gray-300 mb-6 font-light"
+              >
+                {personalInfo.title}
+              </motion.h2>
+            ) : null}
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="text-gray-600 dark:text-gray-400 text-lg mb-8 max-w-2xl mx-auto lg:mx-0"
-            >
-              {personalInfo.summary}
-            </motion.p>
+            {personalInfo.summary ? (
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="text-gray-600 dark:text-gray-400 text-lg mb-8 max-w-2xl mx-auto lg:mx-0"
+              >
+                {personalInfo.summary}
+              </motion.p>
+            ) : null}
 
             {/* CTA Buttons */}
             <motion.div

@@ -1,7 +1,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { ExternalLink, Github, Folder, ArrowUpRight, Shield, Globe } from 'lucide-react';
-import { projects } from '../data/content';
+import { projects, personalInfo } from '../data/content';
 
 const ProjectCard = ({ project, index }) => {
   const ref = useRef(null);
@@ -28,9 +28,11 @@ const ProjectCard = ({ project, index }) => {
                 )}
               </div>
               <div>
-                <span className="text-xs font-medium text-primary-600 dark:text-primary-400 uppercase tracking-wider">
-                  {project.category}
-                </span>
+                {project.category ? (
+                  <span className="text-xs font-medium text-primary-600 dark:text-primary-400 uppercase tracking-wider">
+                    {project.category}
+                  </span>
+                ) : null}
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                   {project.title}
                 </h3>
@@ -65,39 +67,49 @@ const ProjectCard = ({ project, index }) => {
           </div>
 
           {/* Description */}
-          <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
-            {project.description}
-          </p>
+          {project.description ? (
+            <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+              {project.description}
+            </p>
+          ) : (
+            <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+              Details will appear here once added from the resume.
+            </p>
+          )}
 
           {/* Features */}
-          <div className="mb-6">
-            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-              Key Features
-            </h4>
-            <ul className="space-y-2">
-              {project.features.slice(0, 3).map((feature, idx) => (
-                <li
-                  key={idx}
-                  className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400"
-                >
-                  <ArrowUpRight size={14} className="mt-0.5 text-primary-500 flex-shrink-0" />
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </div>
+          {Array.isArray(project.features) && project.features.length > 0 ? (
+            <div className="mb-6">
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                Key Features
+              </h4>
+              <ul className="space-y-2">
+                {project.features.slice(0, 3).map((feature, idx) => (
+                  <li
+                    key={idx}
+                    className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400"
+                  >
+                    <ArrowUpRight size={14} className="mt-0.5 text-primary-500 flex-shrink-0" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
 
           {/* Technologies */}
-          <div className="flex flex-wrap gap-2">
-            {project.technologies.map((tech, idx) => (
-              <span
-                key={idx}
-                className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium rounded-full"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
+          {Array.isArray(project.technologies) && project.technologies.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {project.technologies.map((tech, idx) => (
+                <span
+                  key={idx}
+                  className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium rounded-full"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         {/* Hover Effect Overlay */}
@@ -144,8 +156,8 @@ const Projects = () => {
           viewport={{ once: true }}
           className="text-center mt-12"
         >
-          <motion.a
-            href="https://github.com/notanishm"
+        <motion.a
+            href={personalInfo.github}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-8 py-4 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-full hover:border-primary-600 dark:hover:border-primary-400 hover:text-primary-600 dark:hover:text-primary-400 transition-all"
