@@ -820,7 +820,6 @@ class InfiniteGridMenu {
     c.height = this.cellSize;
     const ctx = c.getContext('2d');
     this.#drawCard(ctx, {
-      accent: item.accent,
       title: item.title,
       lines: [],
       mode: 'thumb',
@@ -834,7 +833,6 @@ class InfiniteGridMenu {
     c.height = this.cellSize;
     const ctx = c.getContext('2d');
     const meta = this.#drawCard(ctx, {
-      accent: item.accent,
       title: item.detailTitle || item.title,
       lines: item.detailLines || [],
       footerLines: item.detailFooterLines || [],
@@ -851,7 +849,6 @@ class InfiniteGridMenu {
     const h = this.cellSize;
     const pad = 56;
     const radius = 64;
-    const accentColor = accent || '#2f78ff';
 
     const roundRect = (x, y, ww, hh, rr) => {
       ctx.beginPath();
@@ -863,60 +860,23 @@ class InfiniteGridMenu {
       ctx.closePath();
     };
 
-    // Grainient-style background (approximation of ReactBits Grainient)
-    const bg = ctx.createLinearGradient(0, 0, w, h);
-    bg.addColorStop(0, '#ff8080');
-    bg.addColorStop(0.55, '#ffffff');
-    bg.addColorStop(1, '#c0c0c0');
-    ctx.fillStyle = bg;
+    ctx.fillStyle = '#000000';
     roundRect(0, 0, w, h, radius);
     ctx.fill();
 
-    // Vignette to improve contrast
-    const vignette = ctx.createRadialGradient(w * 0.5, h * 0.45, w * 0.1, w * 0.5, h * 0.55, w * 0.72);
-    vignette.addColorStop(0, 'rgba(10,18,32,0.12)');
-    vignette.addColorStop(1, 'rgba(10,18,32,0.72)');
-    ctx.fillStyle = vignette;
-    roundRect(0, 0, w, h, radius);
-    ctx.fill();
-
-    // Subtle grain
-    ctx.save();
-    ctx.globalAlpha = 0.08;
-    const grainStep = 6;
-    for (let yy = 0; yy < h; yy += grainStep) {
-      for (let xx = 0; xx < w; xx += grainStep) {
-        const v = Math.random() * 255;
-        ctx.fillStyle = `rgb(${v},${v},${v})`;
-        ctx.fillRect(xx, yy, 1, 1);
-      }
-    }
-    ctx.restore();
-
-    // Accent edge glow
-    ctx.strokeStyle = `${accentColor}55`;
-    ctx.lineWidth = 10;
-    ctx.beginPath();
-    roundRect(8, 8, w - 16, h - 16, radius - 10);
-    ctx.stroke();
-
-    // Safe padding for circular disc (avoid edge clipping when mapped onto a circle)
     const safePad = 140;
     const titleY = 120;
 
-    // Title
-    ctx.fillStyle = 'rgba(255,255,255,0.96)';
+    ctx.fillStyle = '#ffffff';
     ctx.font = mode === 'thumb' ? '900 66px Inter, system-ui, sans-serif' : '900 54px Inter, system-ui, sans-serif';
     ctx.textBaseline = 'top';
     ctx.fillText(String(title || '').toUpperCase(), safePad, titleY, w - safePad * 2);
 
-    // Divider
     ctx.fillStyle = 'rgba(255,255,255,0.22)';
     ctx.fillRect(safePad, mode === 'thumb' ? 200 : 190, w - safePad * 2, 3);
 
     if (mode === 'thumb') return;
 
-    // Photo (optional)
     let textStartY = 260;
     let textMaxWidth = w - safePad * 2;
     if (includePhoto) {
@@ -977,7 +937,6 @@ class InfiniteGridMenu {
       return out;
     };
 
-    // Auto-fit text: shrink font if needed to show more lines.
     let fontSize = dense ? 20 : 26;
     let lineH = dense ? 28 : 36;
     let maxChars = includePhoto ? (dense ? 30 : 34) : (dense ? 42 : 48);
@@ -1009,7 +968,6 @@ class InfiniteGridMenu {
       y += lineH;
     });
 
-    // If clipped, add a subtle continuation hint.
     const totalLines = renderLines.length;
     if (totalLines > maxLines) {
       ctx.fillStyle = 'rgba(255,255,255,0.85)';
