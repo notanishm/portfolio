@@ -691,22 +691,20 @@ class InfiniteGridMenu {
     const targetWorldPos = vec3.transformQuat(vec3.create(), this.instancePositions[bestVertexIndex], this.control.orientation);
     vec3.normalize(targetWorldPos, targetWorldPos);
 
-    const axis = vec3.cross(vec3.create(), targetWorldPos, this.control.snapDirection);
-    vec3.normalize(axis, axis);
-    const angle = Math.acos(Math.max(-1, Math.min(1, vec3.dot(targetWorldPos, this.control.snapDirection))));
+    const cross = vec3.cross(vec3.create(), targetWorldPos, this.control.snapDirection);
+    vec3.normalize(cross, cross);
+    const dot = Math.max(-1, Math.min(1, vec3.dot(targetWorldPos, this.control.snapDirection)));
+    const angle = Math.acos(dot);
 
-    const rotationQuat = quat.create();
-    quat.setAxisAngle(rotationQuat, axis, angle);
+    if (vec3.length(cross) > 0.001) {
+      const rotation = quat.create();
+      quat.setAxisAngle(rotation, cross, angle);
+      quat.multiply(this.control.orientation, rotation, this.control.orientation);
+      quat.normalize(this.control.orientation, this.control.orientation);
+    }
 
-    const inverseRotation = quat.create();
-    quat.invert(inverseRotation, rotationQuat);
-
-    const newOrientation = quat.multiply(quat.create(), inverseRotation, this.control.orientation);
-
-    this.control.orientation = newOrientation;
-    this.control._combinedQuat = quat.clone(newOrientation);
+    this.control._combinedQuat = quat.clone(this.control.orientation);
     this.control.pointerRotation = quat.create();
-    this.control.snapTargetDirection = null;
   }
 
   #init(onInit) {
@@ -1026,7 +1024,7 @@ class InfiniteGridMenu {
 
     const positions = this.instancePositions.map((p) => vec3.transformQuat(vec3.create(), p, this.control.orientation));
 
-    let centerVertexIndex = null;
+    let centerVertexIndex = 0;
     let maxZ = -Infinity;
     for (let i = 0; i < positions.length; i++) {
       if (positions[i][2] > maxZ) {
@@ -1035,29 +1033,28 @@ class InfiniteGridMenu {
       }
     }
 
-    this.centerVertexIndex = centerVertexIndex;
+    const positionsWithZ = positions.map((p, i) => ({ pos: p, index: i, z: p[2] }));
+    positionsWithZ.sort((a, b) => b.z - a.z);
 
-    const baseScale = 0.12;
-    const SCALE_INTENSITY = 0.5;
-    positions.forEach((p, ndx) => {
+    const centerItemIndex = centerVertexIndex % Math.max(1, this.items.length);
+    if (centerItemIndex !== this.activeIndex) {
+      this.setActiveIndex(centerItemIndex);
+      this.onActiveItemChange(centerItemIndex);
+    }
+
+    const baseScale = 0.08;
+    positionsWithZ.forEach(({ pos, index: ndx }) => {
       const isAtCenter = ndx === centerVertexIndex;
-      const zFactor = Math.abs(p[2]) / this.SPHERE_RADIUS;
-      const zScale = zFactor * SCALE_INTENSITY + (1 - SCALE_INTENSITY);
-      const focusBoost = isAtCenter ? 4.5 : 0.4;
-      const finalScale = zScale * baseScale * focusBoost;
+      const zNormalized = (pos[2] + this.SPHERE_RADIUS) / (2 * this.SPHERE_RADIUS);
+      const scale = isAtCenter ? 5.0 : baseScale + zNormalized * 0.15;
+
       const matrix = mat4.create();
-      mat4.multiply(matrix, matrix, mat4.fromTranslation(mat4.create(), vec3.negate(vec3.create(), p)));
-      mat4.multiply(matrix, matrix, mat4.targetTo(mat4.create(), [0, 0, 0], p, [0, 1, 0]));
-      mat4.multiply(matrix, matrix, mat4.fromScaling(mat4.create(), [finalScale, finalScale, finalScale]));
+      mat4.multiply(matrix, matrix, mat4.fromTranslation(mat4.create(), vec3.negate(vec3.create(), pos)));
+      mat4.multiply(matrix, matrix, mat4.targetTo(mat4.create(), [0, 0, 0], pos, [0, 1, 0]));
+      mat4.multiply(matrix, matrix, mat4.fromScaling(mat4.create(), [scale, scale, scale]));
       mat4.multiply(matrix, matrix, mat4.fromTranslation(mat4.create(), [0, 0, -this.SPHERE_RADIUS]));
       mat4.copy(this.discInstances.matrices[ndx], matrix);
     });
-
-    const itemIndex = centerVertexIndex % Math.max(1, this.items.length);
-    if (itemIndex !== this.activeIndex) {
-      this.setActiveIndex(itemIndex);
-      this.onActiveItemChange(itemIndex);
-    }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.discInstances.buffer);
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.discInstances.matricesArray);
@@ -1147,16 +1144,12 @@ const InfiniteMenu3D = forwardRef(function InfiniteMenu3D(
     items = [],
     scale = 1,
     onActiveItemChange,
-    onMovementChange,
-    onSelect,
-    showOverlay = true,
   },
   ref,
 ) {
   const canvasRef = useRef(null);
   const menuRef = useRef(null);
   const [activeItem, setActiveItem] = useState(null);
-  const [isMoving, setIsMoving] = useState(false);
 
   const resolvedItems = useMemo(() => {
     if (!items || items.length === 0) return fallbackItems;
@@ -1180,10 +1173,7 @@ const InfiniteMenu3D = forwardRef(function InfiniteMenu3D(
       onActiveItemChange?.(idx);
     };
 
-    const handleMoving = (moving) => {
-      setIsMoving(moving);
-      onMovementChange?.(moving);
-    };
+    const handleMoving = () => {};
 
     menu = new InfiniteGridMenu(canvas, resolvedItems, handleActive, handleMoving, (m) => {
       menuRef.current = m;
@@ -1191,7 +1181,6 @@ const InfiniteMenu3D = forwardRef(function InfiniteMenu3D(
     }, scale);
 
     const onWheel = (e) => {
-      // Allow scrolling within the focused disc when details overflow.
       e.preventDefault();
       const delta = e.deltaY > 0 ? 2 : -2;
       menuRef.current?.scrollActive(delta);
@@ -1217,41 +1206,14 @@ const InfiniteMenu3D = forwardRef(function InfiniteMenu3D(
       window.removeEventListener('keydown', onKeyDown);
       canvas.removeEventListener('wheel', onWheel);
     };
-  }, [resolvedItems, scale, onActiveItemChange, onMovementChange]);
-
-  const handleSelect = () => {
-    if (!activeItem) return;
-    onSelect?.(activeItem);
-  };
+  }, [resolvedItems, scale, onActiveItemChange]);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <canvas id="infinite-menu-3d-canvas" ref={canvasRef} />
       <div className="crosshair">
-        <div className="crosshair-circle"></div>
+        <div className="crosshair-label">{activeItem?.title || ''}</div>
       </div>
-      {showOverlay ? (
-        <div className="infinite-menu-3d-overlay">
-          {activeItem ? (
-            <>
-              <h2 className={`infinite-menu-3d-title ${isMoving ? 'inactive' : 'active'}`}>{activeItem.title || ''}</h2>
-              {activeItem.description ? (
-                <p className={`infinite-menu-3d-description ${isMoving ? 'inactive' : 'active'}`}>{activeItem.description}</p>
-              ) : null}
-              {onSelect ? (
-                <button
-                  type="button"
-                  onClick={handleSelect}
-                  className={`infinite-menu-3d-action ${isMoving ? 'inactive' : 'active'}`}
-                  aria-label="Select"
-                >
-                  <span aria-hidden="true">↗</span>
-                </button>
-              ) : null}
-            </>
-          ) : null}
-        </div>
-      ) : null}
     </div>
   );
 });
