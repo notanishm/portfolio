@@ -317,7 +317,8 @@ function App() {
         overflowY: 'auto',
         padding: '40px',
         maxWidth: '900px',
-        margin: '0 auto'
+        margin: '0 auto',
+        background: 'transparent'
       }}>
         {renderContent()}
       </div>
