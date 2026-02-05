@@ -186,7 +186,13 @@ function App() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0a0a' }}>
-      <TargetCursor />
+      <TargetCursor 
+        targetSelector=".cursor-target"
+        spinDuration={2}
+        hideDefaultCursor={true}
+        hoverDuration={0.2}
+        parallaxOn={true}
+      />
       <DitherBackground />
       
       <FlowingMenu 

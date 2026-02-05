@@ -39,7 +39,7 @@ function FlowingMenu({ onItemSelect, photoUrl, name, title, children }) {
         </div>
 
         <button
-          className="menu-toggle"
+          className="menu-toggle cursor-target"
           onClick={() => setIsOpen(!isOpen)}
         >
           <span className="hamburger">
@@ -53,7 +53,7 @@ function FlowingMenu({ onItemSelect, photoUrl, name, title, children }) {
           {menuItems.map((item, index) => (
             <button
               key={item.id}
-              className={`menu-item ${activeItem === item.id ? 'active' : ''}`}
+              className={`menu-item cursor-target ${activeItem === item.id ? 'active' : ''}`}
               onClick={() => handleItemClick(item.id)}
               style={{
                 transitionDelay: isOpen ? `${index * 0.05}s` : '0s'
@@ -68,7 +68,7 @@ function FlowingMenu({ onItemSelect, photoUrl, name, title, children }) {
       {activeItem && (
         <div className="content-area">
           <div className="content-box">
-            <button className="close-btn" onClick={() => setActiveItem(null)}>
+            <button className="close-btn cursor-target" onClick={() => setActiveItem(null)}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M18 6L6 18M6 6l12 12" />
               </svg>
