@@ -50,11 +50,14 @@ function FlowingMenu({ onItemSelect, photoUrl, name, title, children }) {
         </button>
 
         <div className={`menu-items ${isOpen ? 'open' : ''}`}>
-          {menuItems.map((item) => (
+          {menuItems.map((item, index) => (
             <button
               key={item.id}
               className={`menu-item ${activeItem === item.id ? 'active' : ''}`}
               onClick={() => handleItemClick(item.id)}
+              style={{
+                transitionDelay: isOpen ? `${index * 0.05}s` : '0s'
+              }}
             >
               {item.label}
             </button>
@@ -145,6 +148,13 @@ function FlowingMenu({ onItemSelect, photoUrl, name, title, children }) {
           display: flex;
           align-items: center;
           justify-content: center;
+          transition: all 0.2s ease;
+        }
+
+        .menu-toggle:hover {
+          background: #1a1a1a;
+          border-color: #444;
+          transform: scale(1.05);
         }
 
         .hamburger {
@@ -165,12 +175,27 @@ function FlowingMenu({ onItemSelect, photoUrl, name, title, children }) {
           gap: 8px;
           opacity: 0;
           pointer-events: none;
-          transition: opacity 0.2s;
+          transition: opacity 0.3s ease;
         }
 
         .menu-items.open {
           opacity: 1;
           pointer-events: auto;
+        }
+
+        .menu-items.open .menu-item {
+          animation: slideIn 0.3s ease forwards;
+        }
+
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateX(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
         }
 
         .menu-item {
@@ -183,13 +208,15 @@ function FlowingMenu({ onItemSelect, photoUrl, name, title, children }) {
           font-size: 14px;
           font-weight: 500;
           text-align: left;
-          transition: all 0.15s;
+          transition: all 0.2s ease;
+          transform: translateX(0);
         }
 
         .menu-item:hover {
           background: #252525;
-          border-color: #444;
+          border-color: #555;
           color: #fff;
+          transform: translateX(4px);
         }
 
         .menu-item.active {
@@ -235,12 +262,14 @@ function FlowingMenu({ onItemSelect, photoUrl, name, title, children }) {
           align-items: center;
           justify-content: center;
           color: #888;
-          transition: all 0.15s;
+          transition: all 0.2s ease;
         }
 
         .close-btn:hover {
-          background: #222;
+          background: #252525;
+          border-color: #444;
           color: #fff;
+          transform: rotate(90deg);
         }
       `}</style>
     </>
