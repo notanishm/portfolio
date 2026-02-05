@@ -707,10 +707,6 @@ class InfiniteGridMenu {
     this.control._combinedQuat = quat.clone(newOrientation);
     this.control.pointerRotation = quat.create();
     this.control.snapTargetDirection = null;
-
-    this.nearestVertexIndex = bestVertexIndex;
-    this.setActiveIndex(target);
-    this.onActiveItemChange(target);
   }
 
   #init(onInit) {
@@ -1029,13 +1025,25 @@ class InfiniteGridMenu {
     this.control.update(deltaTime, this.TARGET_FRAME_DURATION);
 
     const positions = this.instancePositions.map((p) => vec3.transformQuat(vec3.create(), p, this.control.orientation));
+
+    let centerVertexIndex = null;
+    let maxZ = -Infinity;
+    for (let i = 0; i < positions.length; i++) {
+      if (positions[i][2] > maxZ) {
+        maxZ = positions[i][2];
+        centerVertexIndex = i;
+      }
+    }
+
+    this.centerVertexIndex = centerVertexIndex;
+
     const baseScale = 0.12;
     const SCALE_INTENSITY = 0.5;
     positions.forEach((p, ndx) => {
-      const isFocused = this.nearestVertexIndex === ndx;
+      const isAtCenter = ndx === centerVertexIndex;
       const zFactor = Math.abs(p[2]) / this.SPHERE_RADIUS;
       const zScale = zFactor * SCALE_INTENSITY + (1 - SCALE_INTENSITY);
-      const focusBoost = isFocused ? 4.5 : 0.4;
+      const focusBoost = isAtCenter ? 4.5 : 0.4;
       const finalScale = zScale * baseScale * focusBoost;
       const matrix = mat4.create();
       mat4.multiply(matrix, matrix, mat4.fromTranslation(mat4.create(), vec3.negate(vec3.create(), p)));
@@ -1044,6 +1052,12 @@ class InfiniteGridMenu {
       mat4.multiply(matrix, matrix, mat4.fromTranslation(mat4.create(), [0, 0, -this.SPHERE_RADIUS]));
       mat4.copy(this.discInstances.matrices[ndx], matrix);
     });
+
+    const itemIndex = centerVertexIndex % Math.max(1, this.items.length);
+    if (itemIndex !== this.activeIndex) {
+      this.setActiveIndex(itemIndex);
+      this.onActiveItemChange(itemIndex);
+    }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.discInstances.buffer);
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.discInstances.matricesArray);
@@ -1123,28 +1137,6 @@ class InfiniteGridMenu {
 
     this.camera.position[2] += (cameraTargetZ - this.camera.position[2]) / damping;
     this.#updateCameraMatrix();
-  }
-
-  #findNearestVertexIndex() {
-    const n = this.control.isPointerDown ? this.control.snapDirection : (this.control.snapTargetDirection || this.control.snapDirection);
-    const inversOrientation = quat.conjugate(quat.create(), this.control.orientation);
-    const nt = vec3.transformQuat(vec3.create(), n, inversOrientation);
-
-    let maxD = -1;
-    let nearestVertexIndex = 0;
-    for (let i = 0; i < this.instancePositions.length; ++i) {
-      const d = vec3.dot(nt, this.instancePositions[i]);
-      if (d > maxD) {
-        maxD = d;
-        nearestVertexIndex = i;
-      }
-    }
-    return nearestVertexIndex;
-  }
-
-  #getVertexWorldPosition(index) {
-    const nearestVertexPos = this.instancePositions[index];
-    return vec3.transformQuat(vec3.create(), nearestVertexPos, this.control.orientation);
   }
 }
 
@@ -1235,6 +1227,9 @@ const InfiniteMenu3D = forwardRef(function InfiniteMenu3D(
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <canvas id="infinite-menu-3d-canvas" ref={canvasRef} />
+      <div className="crosshair">
+        <div className="crosshair-circle"></div>
+      </div>
       {showOverlay ? (
         <div className="infinite-menu-3d-overlay">
           {activeItem ? (
