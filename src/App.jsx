@@ -123,7 +123,7 @@ function ProjectsContent() {
       {projects.map((project, i) => (
         <div key={i} style={{ marginBottom: '32px', paddingBottom: '24px', borderBottom: i < projects.length - 1 ? '1px solid #333' : 'none' }}>
           <h2 style={{ fontSize: '22px', fontWeight: 600, marginBottom: '12px' }}>{project.title}</h2>
-          <p style={{ color: '#ccc', lineHeight: 1.7, marginBottom: '16px', fontSize: '15px' }}>{project.description}</p>
+          <p style={{ color: '#fff', lineHeight: 1.7, marginBottom: '16px', fontSize: '15px' }}>{project.description}</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
             {project.technologies.map((tech, j) => (
               <span key={j} style={{ background: '#1a1a1a', padding: '6px 12px', borderRadius: '6px', fontSize: '13px' }}>
@@ -131,7 +131,7 @@ function ProjectsContent() {
               </span>
             ))}
           </div>
-          <ul style={{ paddingLeft: '20px', color: '#aaa', fontSize: '14px' }}>
+          <ul style={{ paddingLeft: '20px', color: '#fff', fontSize: '14px' }}>
             {project.features.map((feature, j) => (
               <li key={j} style={{ marginBottom: '8px' }}>{feature}</li>
             ))}
@@ -149,7 +149,7 @@ function CertificationsContent() {
       {certifications.map((cert, i) => (
         <div key={i} style={{ marginBottom: '24px', paddingBottom: '20px', borderBottom: i < certifications.length - 1 ? '1px solid #333' : 'none' }}>
           <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '8px' }}>{cert.title}</h2>
-          <div style={{ color: '#aaa', fontSize: '13px', marginBottom: '12px' }}>{cert.issuer} | {cert.date}</div>
+          <div style={{ color: '#fff', fontSize: '13px', marginBottom: '12px' }}>{cert.issuer} | {cert.date}</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
             {cert.skills.map((skill, j) => (
               <span key={j} style={{ background: '#1a1a1a', padding: '5px 12px', borderRadius: '6px', fontSize: '12px' }}>
@@ -157,12 +157,12 @@ function CertificationsContent() {
               </span>
             ))}
           </div>
-          <ul style={{ paddingLeft: '20px', color: '#aaa', fontSize: '13px' }}>
+          <ul style={{ paddingLeft: '20px', color: '#fff', fontSize: '13px' }}>
             {cert.bullets.slice(0, 4).map((bullet, j) => (
               <li key={j} style={{ marginBottom: '6px' }}>{bullet}</li>
             ))}
             {cert.bullets.length > 4 && (
-              <li style={{ color: '#777' }}>+ {cert.bullets.length - 4} more...</li>
+              <li style={{ color: '#fff' }}>+ {cert.bullets.length - 4} more...</li>
             )}
           </ul>
         </div>
@@ -295,30 +295,25 @@ function App() {
       {/* Menu */}
       <div style={{ 
         position: 'relative', 
-        zIndex: 10,
-        display: 'flex',
-        justifyContent: 'center',
-        width: '100%'
+        zIndex: 10
       }}>
-        <div style={{ width: '50%' }}>
-          <FlowingMenu 
-            items={menuItems}
-            speed={15}
-            textColor="#ffffff"
-            bgColor="rgba(10, 10, 10, 0.8)"
-            marqueeBgColor="#ffffff"
-            marqueeTextColor="#060010"
-            borderColor="#ffffff"
-            onItemClick={setActiveSection}
-          />
-        </div>
+        <FlowingMenu 
+          items={menuItems}
+          speed={15}
+          textColor="#ffffff"
+          bgColor="rgba(10, 10, 10, 0.8)"
+          marqueeBgColor="#ffffff"
+          marqueeTextColor="#060010"
+          borderColor="#ffffff"
+          onItemClick={setActiveSection}
+        />
       </div>
 
       {/* Content */}
       <div style={{ 
         position: 'relative',
         zIndex: 5,
-        height: 'calc(100vh - 200px)',
+        height: 'calc(100vh - 50px)',
         overflowY: 'auto',
         padding: '40px',
         maxWidth: '900px',
