@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Dither from './components/Dither';
 import TargetCursor from './components/TargetCursor';
 import FlowingMenu from './components/FlowingMenu';
+import ScrambledText from './components/ScrambledText';
 import { personalInfo, skills, education, projects, certifications } from './data/content';
 import './App.css';
 
@@ -356,6 +357,15 @@ function App() {
       >
         {renderContent()}
       </div>
+
+      {/* Arch Linux Text */}
+      <ScrambledText 
+        className="arch-text"
+        radius={80}
+        scrambleChars=".:-_/\\"
+      >
+        I use Arch btw
+      </ScrambledText>
     </div>
   );
 }
