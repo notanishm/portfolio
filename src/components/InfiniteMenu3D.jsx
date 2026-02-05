@@ -708,6 +708,7 @@ class InfiniteGridMenu {
     this.control.pointerRotation = quat.create();
     this.control.snapTargetDirection = null;
 
+    this.nearestVertexIndex = bestVertexIndex;
     this.setActiveIndex(target);
     this.onActiveItemChange(target);
   }
