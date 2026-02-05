@@ -465,9 +465,21 @@ class ArcballControl {
       vec2.set(this.pointerPos, e.clientX, e.clientY);
       vec2.copy(this.previousPointerPos, this.pointerPos);
       this.isPointerDown = true;
+
+      try {
+        canvas.setPointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
     });
-    canvas.addEventListener('pointerup', () => {
+    canvas.addEventListener('pointerup', (e) => {
       this.isPointerDown = false;
+
+      try {
+        canvas.releasePointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
     });
     canvas.addEventListener('pointerleave', () => {
       this.isPointerDown = false;
@@ -616,6 +628,11 @@ class InfiniteGridMenu {
     this.#init(onInit);
   }
 
+  setActiveIndex(activeIndex) {
+    this.activeIndex = activeIndex;
+    this.#updateAtlasTextures();
+  }
+
   resize() {
     const gl = this.gl;
     if (resizeCanvasToDisplaySize(gl.canvas)) {
@@ -659,6 +676,9 @@ class InfiniteGridMenu {
     if (bestVertexIndex == null) return;
     const snapDirection = vec3.normalize(vec3.create(), this.#getVertexWorldPosition(bestVertexIndex));
     this.control.snapTargetDirection = snapDirection;
+    if (target !== this.activeIndex) {
+      this.setActiveIndex(target);
+    }
     this.onActiveItemChange(target);
   }
 
@@ -724,34 +744,233 @@ class InfiniteGridMenu {
 
     const itemCount = Math.max(1, this.items.length);
     this.atlasSize = Math.ceil(Math.sqrt(itemCount));
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const cellSize = 512;
+    this.cellSize = 768;
+    this.atlasCanvas = document.createElement('canvas');
+    this.atlasCtx = this.atlasCanvas.getContext('2d');
+    this.atlasCanvas.width = this.atlasSize * this.cellSize;
+    this.atlasCanvas.height = this.atlasSize * this.cellSize;
 
-    canvas.width = this.atlasSize * cellSize;
-    canvas.height = this.atlasSize * cellSize;
+    this.photoImg = null;
+    const needsPhoto = this.items.some((it) => Boolean(it.includePhoto));
+    if (needsPhoto) {
+      this.photoImg = new Image();
+      this.photoImg.onload = () => {
+        // Re-render detail canvases now that the photo is available.
+        this.detailCanvases = this.items.map((item) => this.#renderDetail(item));
+        this.#updateAtlasTextures();
+      };
+      this.photoImg.src = '/profile-photo.jpg';
+    }
 
-    Promise.all(
-      this.items.map(
-        (item) =>
-          new Promise((resolve) => {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = () => resolve(img);
-            img.src = item.image;
-          }),
-      ),
-    ).then((images) => {
-      images.forEach((img, i) => {
-        const x = (i % this.atlasSize) * cellSize;
-        const y = Math.floor(i / this.atlasSize) * cellSize;
-        ctx.drawImage(img, x, y, cellSize, cellSize);
+    this.thumbCanvases = this.items.map((item) => this.#renderThumb(item));
+    this.detailCanvases = this.items.map((item) => this.#renderDetail(item));
+    this.activeIndex = 0;
+    this.#updateAtlasTextures();
+  }
+
+  #updateAtlasTextures() {
+    const gl = this.gl;
+    if (!this.atlasCtx) return;
+
+    const ctx = this.atlasCtx;
+    ctx.clearRect(0, 0, this.atlasCanvas.width, this.atlasCanvas.height);
+
+    // Draw thumbs
+    this.thumbCanvases.forEach((c, i) => {
+      const x = (i % this.atlasSize) * this.cellSize;
+      const y = Math.floor(i / this.atlasSize) * this.cellSize;
+      ctx.drawImage(c, x, y, this.cellSize, this.cellSize);
+    });
+
+    // Replace focused item with detail canvas
+    const active = this.activeIndex ?? 0;
+    if (this.detailCanvases[active]) {
+      const x = (active % this.atlasSize) * this.cellSize;
+      const y = Math.floor(active / this.atlasSize) * this.cellSize;
+      ctx.drawImage(this.detailCanvases[active], x, y, this.cellSize, this.cellSize);
+    }
+
+    gl.bindTexture(gl.TEXTURE_2D, this.tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.atlasCanvas);
+    gl.generateMipmap(gl.TEXTURE_2D);
+  }
+
+  #renderThumb(item) {
+    const c = document.createElement('canvas');
+    c.width = this.cellSize;
+    c.height = this.cellSize;
+    const ctx = c.getContext('2d');
+    this.#drawCard(ctx, {
+      accent: item.accent,
+      title: item.title,
+      lines: [],
+      mode: 'thumb',
+    });
+    return c;
+  }
+
+  #renderDetail(item) {
+    const c = document.createElement('canvas');
+    c.width = this.cellSize;
+    c.height = this.cellSize;
+    const ctx = c.getContext('2d');
+    this.#drawCard(ctx, {
+      accent: item.accent,
+      title: item.detailTitle || item.title,
+      lines: item.detailLines || [],
+      footerLines: item.detailFooterLines || [],
+      includePhoto: Boolean(item.includePhoto),
+      dense: Boolean(item.dense),
+      mode: 'detail',
+    });
+    return c;
+  }
+
+  #drawCard(ctx, { accent, title, lines, footerLines, includePhoto, dense, mode }) {
+    const w = this.cellSize;
+    const h = this.cellSize;
+    const pad = 56;
+    const radius = 64;
+    const accentColor = accent || '#2f78ff';
+
+    const roundRect = (x, y, ww, hh, rr) => {
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.arcTo(x + ww, y, x + ww, y + hh, rr);
+      ctx.arcTo(x + ww, y + hh, x, y + hh, rr);
+      ctx.arcTo(x, y + hh, x, y, rr);
+      ctx.arcTo(x, y, x + ww, y, rr);
+      ctx.closePath();
+    };
+
+    // Background gradient
+    const g = ctx.createLinearGradient(0, 0, w, h);
+    g.addColorStop(0, accentColor);
+    g.addColorStop(1, '#0b1220');
+    ctx.fillStyle = g;
+    roundRect(0, 0, w, h, radius);
+    ctx.fill();
+
+    // Soft highlights
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    ctx.beginPath();
+    ctx.ellipse(w * 0.28, h * 0.2, w * 0.22, h * 0.16, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    ctx.beginPath();
+    ctx.ellipse(w * 0.82, h * 0.82, w * 0.28, h * 0.22, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Title
+    ctx.fillStyle = 'rgba(255,255,255,0.96)';
+    ctx.font = mode === 'thumb' ? '900 78px Inter, system-ui, sans-serif' : '900 56px Inter, system-ui, sans-serif';
+    ctx.textBaseline = 'top';
+    ctx.fillText(String(title || '').toUpperCase(), pad, 66, w - pad * 2);
+
+    // Divider
+    ctx.fillStyle = 'rgba(255,255,255,0.22)';
+    ctx.fillRect(pad, mode === 'thumb' ? 170 : 150, w - pad * 2, 3);
+
+    if (mode === 'thumb') return;
+
+    // Photo (optional)
+    let textStartY = 210;
+    let textMaxWidth = w - pad * 2;
+    if (includePhoto) {
+      const photoSize = 168;
+      const px = pad;
+      const py = 206;
+      ctx.save();
+      roundRect(px, py, photoSize, photoSize, 28);
+      ctx.clip();
+      ctx.fillStyle = 'rgba(0,0,0,0.25)';
+      ctx.fillRect(px, py, photoSize, photoSize);
+      const img = this.photoImg;
+      if (img && img.complete && img.naturalWidth) {
+        const s = Math.max(photoSize / img.naturalWidth, photoSize / img.naturalHeight);
+        const dw = img.naturalWidth * s;
+        const dh = img.naturalHeight * s;
+        ctx.drawImage(img, px + (photoSize - dw) / 2, py + (photoSize - dh) / 2, dw, dh);
+      }
+      ctx.restore();
+
+      textStartY = py;
+      textMaxWidth = w - pad * 2 - photoSize - 28;
+    }
+
+    const x = includePhoto ? pad + 168 + 28 : pad;
+    const maxY = h - 72;
+
+    const buildRenderLines = (maxChars) => {
+      const out = [];
+      const pushWrapped = (t) => {
+        const words = String(t || '').replace(/\s+/g, ' ').trim().split(' ');
+        let line = '';
+        for (const word of words) {
+          const next = line ? `${line} ${word}` : word;
+          if (next.length > maxChars) {
+            if (line) out.push(line);
+            line = word;
+          } else {
+            line = next;
+          }
+        }
+        if (line) out.push(line);
+      };
+
+      (lines || []).forEach((l) => {
+        if (!l) {
+          out.push('');
+          return;
+        }
+        pushWrapped(l);
       });
 
-      gl.bindTexture(gl.TEXTURE_2D, this.tex);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
-      gl.generateMipmap(gl.TEXTURE_2D);
+      if (footerLines && footerLines.length) {
+        out.push('');
+        footerLines.forEach((l) => out.push(String(l)));
+      }
+
+      return out;
+    };
+
+    // Auto-fit text: shrink font if needed to show more lines.
+    let fontSize = dense ? 22 : 28;
+    let lineH = dense ? 30 : 38;
+    let maxChars = includePhoto ? (dense ? 28 : 32) : (dense ? 38 : 44);
+
+    let renderLines = buildRenderLines(maxChars);
+    let y = textStartY;
+    let maxLines = Math.floor((maxY - y) / lineH);
+    while (renderLines.length > maxLines && fontSize > 18) {
+      fontSize -= 2;
+      lineH = Math.max(24, Math.round(lineH * 0.92));
+      maxChars = Math.max(22, Math.round(maxChars * 0.92));
+      renderLines = buildRenderLines(maxChars);
+      maxLines = Math.floor((maxY - y) / lineH);
+    }
+
+    ctx.fillStyle = 'rgba(255,255,255,0.90)';
+    ctx.font = `600 ${fontSize}px Inter, system-ui, sans-serif`;
+    ctx.textBaseline = 'top';
+
+    const visible = renderLines.slice(0, Math.max(0, maxLines));
+    visible.forEach((l) => {
+      if (y > maxY) return;
+      if (l === '') {
+        y += Math.floor(lineH * 0.6);
+        return;
+      }
+      ctx.fillText(l, x, y, textMaxWidth);
+      y += lineH;
     });
+
+    // If clipped, add a subtle continuation hint.
+    if (renderLines.length > maxLines) {
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.font = `700 ${fontSize}px Inter, system-ui, sans-serif`;
+      ctx.fillText('...', x, Math.min(maxY, y), textMaxWidth);
+    }
   }
 
   #initDiscInstances(count) {
@@ -786,11 +1005,13 @@ class InfiniteGridMenu {
     this.control.update(deltaTime, this.TARGET_FRAME_DURATION);
 
     const positions = this.instancePositions.map((p) => vec3.transformQuat(vec3.create(), p, this.control.orientation));
-    const scale = 0.25;
+    const baseScale = 0.34;
     const SCALE_INTENSITY = 0.6;
     positions.forEach((p, ndx) => {
       const s = (Math.abs(p[2]) / this.SPHERE_RADIUS) * SCALE_INTENSITY + (1 - SCALE_INTENSITY);
-      const finalScale = s * scale;
+      const isFocused = this.nearestVertexIndex === ndx;
+      const focusBoost = isFocused ? 1.6 : 1.0;
+      const finalScale = s * baseScale * focusBoost;
       const matrix = mat4.create();
       mat4.multiply(matrix, matrix, mat4.fromTranslation(mat4.create(), vec3.negate(vec3.create(), p)));
       mat4.multiply(matrix, matrix, mat4.targetTo(mat4.create(), [0, 0, 0], p, [0, 1, 0]));
@@ -872,7 +1093,11 @@ class InfiniteGridMenu {
 
     if (!this.control.isPointerDown) {
       const nearestVertexIndex = this.#findNearestVertexIndex();
+      this.nearestVertexIndex = nearestVertexIndex;
       const itemIndex = nearestVertexIndex % Math.max(1, this.items.length);
+      if (itemIndex !== this.activeIndex) {
+        this.setActiveIndex(itemIndex);
+      }
       this.onActiveItemChange(itemIndex);
       const snapDirection = vec3.normalize(vec3.create(), this.#getVertexWorldPosition(nearestVertexIndex));
       this.control.snapTargetDirection = snapDirection;
