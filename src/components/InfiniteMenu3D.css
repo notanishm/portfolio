@@ -6,6 +6,7 @@
   overflow: hidden;
   position: relative;
   outline: none;
+  background: linear-gradient(180deg, #ff8080 0%, #ffffff 55%, #c0c0c0 100%);
 }
 
 #infinite-menu-3d-canvas:active {

@@ -1011,13 +1011,14 @@ class InfiniteGridMenu {
     this.control.update(deltaTime, this.TARGET_FRAME_DURATION);
 
     const positions = this.instancePositions.map((p) => vec3.transformQuat(vec3.create(), p, this.control.orientation));
-    const baseScale = 0.42;
-    const SCALE_INTENSITY = 0.6;
+    const baseScale = 0.12;
+    const SCALE_INTENSITY = 0.5;
     positions.forEach((p, ndx) => {
-      const s = (Math.abs(p[2]) / this.SPHERE_RADIUS) * SCALE_INTENSITY + (1 - SCALE_INTENSITY);
       const isFocused = this.nearestVertexIndex === ndx;
-      const focusBoost = isFocused ? 2.25 : 1.0;
-      const finalScale = s * baseScale * focusBoost;
+      const zFactor = Math.abs(p[2]) / this.SPHERE_RADIUS;
+      const zScale = zFactor * SCALE_INTENSITY + (1 - SCALE_INTENSITY);
+      const focusBoost = isFocused ? 4.5 : 0.4;
+      const finalScale = zScale * baseScale * focusBoost;
       const matrix = mat4.create();
       mat4.multiply(matrix, matrix, mat4.fromTranslation(mat4.create(), vec3.negate(vec3.create(), p)));
       mat4.multiply(matrix, matrix, mat4.targetTo(mat4.create(), [0, 0, 0], p, [0, 1, 0]));
