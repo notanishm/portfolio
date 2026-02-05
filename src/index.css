@@ -18,6 +18,10 @@ body {
   cursor: none;
 }
 
+body * {
+  cursor: none;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
 }

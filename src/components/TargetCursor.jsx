@@ -1,50 +1,71 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 function TargetCursor() {
   const cursorRef = useRef(null);
   const ringRef = useRef(null);
+  const animationRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const cursor = cursorRef.current;
-    const ring = ringRef.current;
-    let animationId;
+    let mouseX = -100;
+    let mouseY = -100;
+    let cursorX = -100;
+    let cursorY = -100;
+    let ringScale = 0;
+    let ringGrowing = true;
 
-    const move = (e) => {
-      const x = e.clientX;
-      const y = e.clientY;
-
-      if (cursor) {
-        cursor.style.left = `${x}px`;
-        cursor.style.top = `${y}px`;
-      }
-
-      if (ring) {
-        ring.style.left = `${x}px`;
-        ring.style.top = `${y}px`;
+    const onMouseMove = (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      if (!isVisible) {
+        setIsVisible(true);
       }
     };
 
     const animate = () => {
-      if (ring) {
-        const scale = parseFloat(ring.style.transform.replace(/[^\d.]/g, '') || 1) || 1;
-        const newScale = scale + 0.02;
-        if (newScale > 1.5) {
-          ring.style.transform = 'translate(-50%, -50%) scale(0)';
-        } else {
-          ring.style.transform = `translate(-50%, -50%) scale(${newScale})`;
+      cursorX += (mouseX - cursorX) * 0.2;
+      cursorY += (mouseY - cursorY) * 0.2;
+
+      if (ringGrowing) {
+        ringScale += 0.03;
+        if (ringScale >= 1) {
+          ringScale = 1;
+          ringGrowing = false;
+        }
+      } else {
+        ringScale -= 0.03;
+        if (ringScale <= 0) {
+          ringScale = 0;
+          ringGrowing = true;
         }
       }
-      animationId = requestAnimationFrame(animate);
+
+      if (cursorRef.current) {
+        cursorRef.current.style.left = `${cursorX}px`;
+        cursorRef.current.style.top = `${cursorY}px`;
+      }
+
+      if (ringRef.current) {
+        const size = 20 + ringScale * 80;
+        ringRef.current.style.width = `${size}px`;
+        ringRef.current.style.height = `${size}px`;
+        ringRef.current.style.left = `${cursorX}px`;
+        ringRef.current.style.top = `${cursorY}px`;
+      }
+
+      animationRef.current = requestAnimationFrame(animate);
     };
 
-    window.addEventListener('mousemove', move);
+    window.addEventListener('mousemove', onMouseMove);
     animate();
 
     return () => {
-      window.removeEventListener('mousemove', move);
-      cancelAnimationFrame(animationId);
+      window.removeEventListener('mousemove', onMouseMove);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
     };
-  }, []);
+  }, [isVisible]);
 
   return (
     <>
@@ -52,28 +73,30 @@ function TargetCursor() {
         ref={cursorRef}
         style={{
           position: 'fixed',
-          width: '8px',
-          height: '8px',
-          background: '#fff',
+          width: '6px',
+          height: '6px',
+          background: '#ffffff',
           borderRadius: '50%',
           transform: 'translate(-50%, -50%)',
           pointerEvents: 'none',
-          zIndex: 9999,
-          mixBlendMode: 'difference',
+          zIndex: 99999,
+          opacity: isVisible ? 1 : 0,
+          transition: 'opacity 0.2s ease',
         }}
       />
       <div
         ref={ringRef}
         style={{
           position: 'fixed',
-          width: '40px',
-          height: '40px',
-          border: '2px solid #fff',
+          width: '20px',
+          height: '20px',
+          border: '2px solid rgba(255, 255, 255, 0.6)',
           borderRadius: '50%',
-          transform: 'translate(-50%, -50%) scale(0)',
+          transform: 'translate(-50%, -50%)',
           pointerEvents: 'none',
-          zIndex: 9998,
-          mixBlendMode: 'difference',
+          zIndex: 99998,
+          opacity: isVisible ? 1 : 0,
+          transition: 'opacity 0.2s ease',
         }}
       />
     </>
