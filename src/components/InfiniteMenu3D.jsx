@@ -687,11 +687,15 @@ class InfiniteGridMenu {
     }
 
     if (bestVertexIndex == null) return;
-    const snapDirection = vec3.normalize(vec3.create(), this.#getVertexWorldPosition(bestVertexIndex));
-    this.control.snapTargetDirection = snapDirection;
-    if (target !== this.activeIndex) {
-      this.setActiveIndex(target);
-    }
+
+    const targetWorldPos = vec3.transformQuat(vec3.create(), this.instancePositions[bestVertexIndex], this.control.orientation);
+    vec3.normalize(targetWorldPos, targetWorldPos);
+    this.control.snapTargetDirection = targetWorldPos;
+    this.control.orientation = quat.create();
+    this.control._combinedQuat = quat.create();
+    this.control.pointerRotation = quat.create();
+
+    this.setActiveIndex(target);
     this.onActiveItemChange(target);
   }
 
@@ -1098,19 +1102,7 @@ class InfiniteGridMenu {
       this.onMovementChange(isMoving);
     }
 
-    if (!this.control.isPointerDown) {
-      const nearestVertexIndex = this.#findNearestVertexIndex();
-      this.nearestVertexIndex = nearestVertexIndex;
-      const itemIndex = nearestVertexIndex % Math.max(1, this.items.length);
-      if (itemIndex !== this.activeIndex) {
-        this.setActiveIndex(itemIndex);
-      }
-      this.onActiveItemChange(itemIndex);
-      if (!this.control.snapTargetDirection) {
-        const snapDirection = vec3.normalize(vec3.create(), this.#getVertexWorldPosition(nearestVertexIndex));
-        this.control.snapTargetDirection = snapDirection;
-      }
-    } else {
+    if (this.control.isPointerDown) {
       cameraTargetZ += this.control.rotationVelocity * 80 + 2.5;
       damping = 7 / timeScale;
     }
