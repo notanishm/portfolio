@@ -1,37 +1,216 @@
-import { useMemo, useRef, useState } from 'react';
-import { ThemeProvider } from './context/ThemeContext';
-import Sidebar from './components/Sidebar';
-import Menu3D from './sections/Menu3D';
-import { menu3dItems } from './data/content';
+import { useState } from 'react';
+import DitherBackground from './components/DitherBackground';
+import FlowingMenu from './components/FlowingMenu';
+import { personalInfo, skills, education, projects, certifications } from './data/content';
+
+function AboutContent() {
+  return (
+    <div style={{ color: '#fff' }}>
+      <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '24px' }}>About Me</h1>
+      <p style={{ fontSize: '16px', lineHeight: 1.7, marginBottom: '24px', color: 'rgba(255,255,255,0.8)' }}>
+        {personalInfo.summary}
+      </p>
+      <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '16px' }}>Education</h2>
+      {education.map((edu, i) => (
+        <div key={i} style={{ marginBottom: '16px' }}>
+          <div style={{ fontWeight: 600, fontSize: '18px' }}>{edu.institution}</div>
+          <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px' }}>{edu.degree}</div>
+          <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px' }}>{edu.period}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SkillsContent() {
+  return (
+    <div style={{ color: '#fff' }}>
+      <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '24px' }}>Technical Skills</h1>
+      
+      <div style={{ marginBottom: '20px' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px', color: 'rgba(255,255,255,0.6)' }}>Languages</h3>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+          {skills.languages.map((s, i) => (
+            <span key={i} style={{ background: 'rgba(255,255,255,0.1)', padding: '6px 14px', borderRadius: '20px', fontSize: '14px' }}>
+              {s.name}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ marginBottom: '20px' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px', color: 'rgba(255,255,255,0.6)' }}>Frameworks</h3>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+          {skills.frameworks.map((s, i) => (
+            <span key={i} style={{ background: 'rgba(255,255,255,0.1)', padding: '6px 14px', borderRadius: '20px', fontSize: '14px' }}>
+              {s.name}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ marginBottom: '20px' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px', color: 'rgba(255,255,255,0.6)' }}>Security</h3>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+          {skills.security.map((s, i) => (
+            <span key={i} style={{ background: 'rgba(255,255,255,0.1)', padding: '6px 14px', borderRadius: '20px', fontSize: '14px' }}>
+              {s.name}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px', color: 'rgba(255,255,255,0.6)' }}>Tools</h3>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+          {skills.tools.map((s, i) => (
+            <span key={i} style={{ background: 'rgba(255,255,255,0.1)', padding: '6px 14px', borderRadius: '20px', fontSize: '14px' }}>
+              {s.name}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProjectsContent() {
+  return (
+    <div style={{ color: '#fff' }}>
+      <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '24px' }}>Projects</h1>
+      {projects.map((project, i) => (
+        <div key={i} style={{ marginBottom: '32px' }}>
+          <h2 style={{ fontSize: '22px', fontWeight: 600, marginBottom: '12px' }}>{project.title}</h2>
+          <p style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, marginBottom: '16px' }}>{project.description}</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
+            {project.technologies.map((tech, j) => (
+              <span key={j} style={{ background: 'rgba(255,255,255,0.1)', padding: '4px 12px', borderRadius: '16px', fontSize: '13px' }}>
+                {tech}
+              </span>
+            ))}
+          </div>
+          <ul style={{ paddingLeft: '20px', color: 'rgba(255,255,255,0.7)' }}>
+            {project.features.map((feature, j) => (
+              <li key={j} style={{ marginBottom: '8px', lineHeight: 1.5 }}>{feature}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CertificationsContent() {
+  return (
+    <div style={{ color: '#fff' }}>
+      <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '24px' }}>Certifications</h1>
+      {certifications.map((cert, i) => (
+        <div key={i} style={{ marginBottom: '32px', paddingBottom: '24px', borderBottom: i < certifications.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '8px' }}>{cert.title}</h2>
+          <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', marginBottom: '12px' }}>
+            {cert.issuer} | {cert.date}
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+            {cert.skills.map((skill, j) => (
+              <span key={j} style={{ background: 'rgba(255,255,255,0.1)', padding: '4px 10px', borderRadius: '12px', fontSize: '12px' }}>
+                {skill}
+              </span>
+            ))}
+          </div>
+          <ul style={{ paddingLeft: '18px', color: 'rgba(255,255,255,0.7)', fontSize: '14px' }}>
+            {cert.bullets.slice(0, 5).map((bullet, j) => (
+              <li key={j} style={{ marginBottom: '6px' }}>{bullet}</li>
+            ))}
+            {cert.bullets.length > 5 && (
+              <li style={{ color: 'rgba(255,255,255,0.5)' }}>+ {cert.bullets.length - 5} more...</li>
+            )}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ContactContent() {
+  return (
+    <div style={{ color: '#fff' }}>
+      <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '24px' }}>Contact</h1>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div>
+          <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>Email</div>
+          <div style={{ fontSize: '18px' }}>{personalInfo.email}</div>
+        </div>
+        <div>
+          <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>Phone</div>
+          <div style={{ fontSize: '18px' }}>{personalInfo.phone}</div>
+        </div>
+        <div>
+          <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>Location</div>
+          <div style={{ fontSize: '18px' }}>{personalInfo.location}</div>
+        </div>
+        <div>
+          <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>LinkedIn</div>
+          <div style={{ fontSize: '18px' }}>{personalInfo.linkedin.replace('https://', '')}</div>
+        </div>
+        <div>
+          <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>GitHub</div>
+          <div style={{ fontSize: '18px' }}>{personalInfo.github.replace('https://', '')}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function App() {
-  const [activeSection, setActiveSection] = useState('home');
-  const menu3dRef = useRef(null);
+  const [activeSection, setActiveSection] = useState(null);
 
-  const focusMenuItemById = (id) => {
-    const idx = menu3dItems.findIndex((x) => x.id === id);
-    if (idx >= 0) {
-      menu3dRef.current?.focusItem(idx);
+  const handleItemSelect = (itemId) => {
+    setActiveSection(itemId);
+  };
+
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'about':
+        return <AboutContent />;
+      case 'skills':
+        return <SkillsContent />;
+      case 'projects':
+        return <ProjectsContent />;
+      case 'certifications':
+        return <CertificationsContent />;
+      case 'contact':
+        return <ContactContent />;
+      default:
+        return null;
     }
-    setActiveSection(id);
   };
 
   return (
-    <ThemeProvider>
-      <div className="h-screen overflow-hidden bg-white dark:bg-gray-900 transition-colors duration-300">
-        <Sidebar activeId={activeSection} onItemClick={focusMenuItemById} />
-        <main className="h-full">
-          <Menu3D
-            ref={menu3dRef}
-            items={menu3dItems}
-            onActiveItemChange={(idx) => {
-              const id = menu3dItems[idx]?.id;
-              if (id) setActiveSection(id);
-            }}
-          />
-        </main>
+    <div style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
+      <DitherBackground />
+      
+      <FlowingMenu onItemSelect={handleItemSelect}>
+        {renderContent()}
+      </FlowingMenu>
+
+      <div
+        style={{
+          position: 'fixed',
+          bottom: '40px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          textAlign: 'center',
+          color: '#fff',
+        }}
+      >
+        <h1 style={{ fontSize: '48px', fontWeight: 800, marginBottom: '8px', letterSpacing: '-0.02em' }}>
+          Anish Maisekar
+        </h1>
+        <p style={{ fontSize: '18px', opacity: 0.7 }}>
+          {personalInfo.title}
+        </p>
       </div>
-    </ThemeProvider>
+    </div>
   );
 }
 
