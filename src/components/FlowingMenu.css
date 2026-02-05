@@ -3,6 +3,7 @@
   height: 50px;
   overflow: hidden;
   position: relative;
+  transition: height 0.3s ease;
 }
 
 .menu {
@@ -19,6 +20,7 @@
   overflow: hidden;
   text-align: center;
   border-left: 1px solid;
+  transition: flex 0.3s ease;
 }
 
 .menu__item:first-child {
@@ -36,7 +38,8 @@
   text-decoration: none;
   white-space: nowrap;
   font-weight: 600;
-  font-size: 2.5vh;
+  font-size: clamp(10px, 2.5vh, 18px);
+  transition: font-size 0.3s ease;
 }
 
 .menu__item-link:hover {
@@ -83,17 +86,41 @@
   white-space: nowrap;
   text-transform: uppercase;
   font-weight: 400;
-  font-size: 2.5vh;
+  font-size: clamp(10px, 2.5vh, 18px);
   line-height: 1;
   padding: 0 1vw;
+  transition: font-size 0.3s ease;
 }
 
 .marquee__img {
-  width: 150px;
+  width: clamp(100px, 150px, 200px);
   height: 5vh;
   margin: 1em 2vw;
   padding: 0.5em 0;
   border-radius: 30px;
   background-size: cover;
   background-position: 50% 50%;
+  transition: width 0.3s ease;
 }
+
+/* Responsive menu adjustments */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .menu-wrap {
+    height: 45px;
+  }
+
+  .menu__item-link {
+    font-size: clamp(9px, 2vh, 16px);
+  }
+
+  .marquee span {
+    font-size: clamp(9px, 2vh, 16px);
+  }
+}
+
+@media (max-width: 1280px) and (min-width: 1025px) {
+  .menu-wrap {
+    height: 48px;
+  }
+}
+

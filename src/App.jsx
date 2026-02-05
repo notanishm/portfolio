@@ -2,13 +2,15 @@ import { useState } from 'react';
 import Dither from './components/Dither';
 import TargetCursor from './components/TargetCursor';
 import FlowingMenu from './components/FlowingMenu';
+import MobileMenu from './components/MobileMenu';
 import { personalInfo, skills, education, projects, certifications } from './data/content';
+import './App.css';
 
 // Content Components
 function AboutContent() {
   return (
     <div style={{ color: '#fff' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '32px', marginBottom: '32px' }}>
+      <div className="about-header" style={{ display: 'flex', alignItems: 'flex-start', gap: '32px', marginBottom: '32px' }}>
         <div style={{ flexShrink: 0 }}>
           <img 
             src="/profile-photo.jpg" 
@@ -293,9 +295,9 @@ function App() {
     }}>
       <TargetCursor 
         targetSelector=".cursor-target"
-        spinDuration={2}
+        spinDuration={12}
         hideDefaultCursor={true}
-        hoverDuration={0.2}
+        hoverDuration={0.15}
         parallaxOn={true}
       />
       
@@ -320,11 +322,14 @@ function App() {
         />
       </div>
       
-      {/* Menu */}
-      <div style={{ 
-        position: 'relative', 
-        zIndex: 10
-      }}>
+      {/* Desktop Menu */}
+      <div 
+        style={{ 
+          position: 'relative', 
+          zIndex: 10
+        }}
+        className="desktop-menu"
+      >
         <FlowingMenu 
           items={menuItems}
           speed={15}
@@ -337,17 +342,27 @@ function App() {
         />
       </div>
 
+      {/* Mobile Menu */}
+      <MobileMenu 
+        items={menuItems}
+        onItemClick={setActiveSection}
+        activeSection={activeSection}
+      />
+
       {/* Content */}
-      <div style={{ 
-        position: 'relative',
-        zIndex: 5,
-        height: 'calc(100vh - 50px)',
-        overflowY: 'auto',
-        padding: '40px',
-        maxWidth: '900px',
-        margin: '0 auto',
-        background: 'transparent'
-      }}>
+      <div 
+        className="content-wrapper"
+        style={{ 
+          position: 'relative',
+          zIndex: 5,
+          height: 'calc(100vh - 50px)',
+          overflowY: 'auto',
+          padding: '40px',
+          maxWidth: '900px',
+          margin: '0 auto',
+          background: 'transparent'
+        }}
+      >
         {renderContent()}
       </div>
     </div>
