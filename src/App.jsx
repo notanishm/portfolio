@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
+import Sidebar from './components/Sidebar';
 import Menu3D from './sections/Menu3D';
 import { menu3dItems } from './data/content';
 
@@ -12,19 +13,13 @@ function App() {
     if (idx >= 0) {
       menu3dRef.current?.focusItem(idx);
     }
-  };
-
-  const handleTopNavClick = (item) => {
-    const id = item?.href?.startsWith('#') ? item.href.slice(1) : item?.id;
-    if (!id) return;
-
-    focusMenuItemById(id);
     setActiveSection(id);
   };
 
   return (
     <ThemeProvider>
       <div className="h-screen overflow-hidden bg-white dark:bg-gray-900 transition-colors duration-300">
+        <Sidebar activeId={activeSection} onItemClick={focusMenuItemById} />
         <main className="h-full">
           <Menu3D
             ref={menu3dRef}
