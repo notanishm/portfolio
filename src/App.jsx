@@ -8,10 +8,50 @@ import { personalInfo, skills, education, projects, certifications } from './dat
 function AboutContent() {
   return (
     <div style={{ color: '#fff' }}>
-      <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '24px' }}>About Me</h1>
-      <p style={{ fontSize: '16px', lineHeight: 1.8, marginBottom: '24px', color: '#ccc' }}>
-        {personalInfo.summary}
-      </p>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '32px', marginBottom: '32px' }}>
+        <div style={{ flexShrink: 0 }}>
+          <img 
+            src="/profile-photo.jpg" 
+            alt={personalInfo.name}
+            style={{ 
+              width: '150px', 
+              height: '150px', 
+              borderRadius: '16px', 
+              objectFit: 'cover',
+              border: '2px solid #333'
+            }}
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.nextSibling.style.display = 'flex';
+            }}
+          />
+          <div style={{ 
+            width: '150px', 
+            height: '150px', 
+            borderRadius: '16px', 
+            background: '#1a1a1a',
+            border: '2px solid #333',
+            display: 'none',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            color: '#666'
+          }}>
+            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </div>
+        </div>
+        <div style={{ flex: 1 }}>
+          <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>{personalInfo.name}</h1>
+          <p style={{ fontSize: '18px', color: '#aaa', marginBottom: '16px' }}>{personalInfo.title}</p>
+          <p style={{ fontSize: '16px', lineHeight: 1.8, color: '#ccc' }}>
+            {personalInfo.summary}
+          </p>
+        </div>
+      </div>
+      
       <h2 style={{ fontSize: '24px', fontWeight: 600, marginBottom: '16px', marginTop: '32px' }}>Education</h2>
       {education.map((edu, i) => (
         <div key={i} style={{ marginBottom: '16px', padding: '16px', background: '#1a1a1a', borderRadius: '12px' }}>
@@ -255,18 +295,23 @@ function App() {
       {/* Menu */}
       <div style={{ 
         position: 'relative', 
-        zIndex: 10
+        zIndex: 10,
+        display: 'flex',
+        justifyContent: 'center',
+        width: '100%'
       }}>
-        <FlowingMenu 
-          items={menuItems}
-          speed={15}
-          textColor="#ffffff"
-          bgColor="rgba(10, 10, 10, 0.8)"
-          marqueeBgColor="#ffffff"
-          marqueeTextColor="#060010"
-          borderColor="#ffffff"
-          onItemClick={setActiveSection}
-        />
+        <div style={{ width: '50%' }}>
+          <FlowingMenu 
+            items={menuItems}
+            speed={15}
+            textColor="#ffffff"
+            bgColor="rgba(10, 10, 10, 0.8)"
+            marqueeBgColor="#ffffff"
+            marqueeTextColor="#060010"
+            borderColor="#ffffff"
+            onItemClick={setActiveSection}
+          />
+        </div>
       </div>
 
       {/* Content */}
