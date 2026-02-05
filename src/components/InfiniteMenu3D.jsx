@@ -690,10 +690,23 @@ class InfiniteGridMenu {
 
     const targetWorldPos = vec3.transformQuat(vec3.create(), this.instancePositions[bestVertexIndex], this.control.orientation);
     vec3.normalize(targetWorldPos, targetWorldPos);
-    this.control.snapTargetDirection = targetWorldPos;
-    this.control.orientation = quat.create();
-    this.control._combinedQuat = quat.create();
+
+    const axis = vec3.cross(vec3.create(), targetWorldPos, this.control.snapDirection);
+    vec3.normalize(axis, axis);
+    const angle = Math.acos(Math.max(-1, Math.min(1, vec3.dot(targetWorldPos, this.control.snapDirection))));
+
+    const rotationQuat = quat.create();
+    quat.setAxisAngle(rotationQuat, axis, angle);
+
+    const inverseRotation = quat.create();
+    quat.invert(inverseRotation, rotationQuat);
+
+    const newOrientation = quat.multiply(quat.create(), inverseRotation, this.control.orientation);
+
+    this.control.orientation = newOrientation;
+    this.control._combinedQuat = quat.clone(newOrientation);
     this.control.pointerRotation = quat.create();
+    this.control.snapTargetDirection = null;
 
     this.setActiveIndex(target);
     this.onActiveItemChange(target);
@@ -1093,7 +1106,7 @@ class InfiniteGridMenu {
 
   #onControlUpdate(deltaTime) {
     const timeScale = deltaTime / this.TARGET_FRAME_DURATION + 0.0001;
-    let damping = 5 / timeScale;
+    let damping = 3 / timeScale;
     let cameraTargetZ = 3 * this.scaleFactor;
 
     const isMoving = this.control.isPointerDown || Math.abs(this.smoothRotationVelocity) > 0.01;
