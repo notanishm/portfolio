@@ -45,8 +45,8 @@ function AboutContent() {
         </div>
         <div style={{ flex: 1 }}>
           <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>{personalInfo.name}</h1>
-          <p style={{ fontSize: '18px', color: '#aaa', marginBottom: '16px' }}>{personalInfo.title}</p>
-          <p style={{ fontSize: '16px', lineHeight: 1.8, color: '#ccc' }}>
+          <p style={{ fontSize: '18px', color: '#fff', marginBottom: '16px' }}>{personalInfo.title}</p>
+          <p style={{ fontSize: '16px', lineHeight: 1.8, color: '#fff' }}>
             {personalInfo.summary}
           </p>
         </div>
@@ -56,8 +56,8 @@ function AboutContent() {
       {education.map((edu, i) => (
         <div key={i} style={{ marginBottom: '16px', padding: '16px', background: '#1a1a1a', borderRadius: '12px' }}>
           <div style={{ fontWeight: 600, fontSize: '16px', marginBottom: '6px' }}>{edu.institution}</div>
-          <div style={{ color: '#aaa', fontSize: '14px' }}>{edu.degree}</div>
-          <div style={{ color: '#888', fontSize: '13px' }}>{edu.period}</div>
+          <div style={{ color: '#fff', fontSize: '14px' }}>{edu.degree}</div>
+          <div style={{ color: '#fff', fontSize: '13px' }}>{edu.period}</div>
         </div>
       ))}
     </div>
@@ -70,7 +70,7 @@ function SkillsContent() {
       <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '24px' }}>Technical Skills</h1>
       
       <div style={{ marginBottom: '20px' }}>
-        <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: '#aaa', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Languages</h3>
+        <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: '#fff', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Languages</h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
           {skills.languages.map((s, i) => (
             <span key={i} style={{ background: '#1a1a1a', padding: '8px 16px', borderRadius: '8px', fontSize: '14px' }}>
@@ -81,7 +81,7 @@ function SkillsContent() {
       </div>
 
       <div style={{ marginBottom: '20px' }}>
-        <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: '#aaa', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Frameworks</h3>
+        <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: '#fff', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Frameworks</h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
           {skills.frameworks.map((s, i) => (
             <span key={i} style={{ background: '#1a1a1a', padding: '8px 16px', borderRadius: '8px', fontSize: '14px' }}>
@@ -92,7 +92,7 @@ function SkillsContent() {
       </div>
 
       <div style={{ marginBottom: '20px' }}>
-        <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: '#aaa', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Security</h3>
+        <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: '#fff', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Security</h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
           {skills.security.map((s, i) => (
             <span key={i} style={{ background: '#1a1a1a', padding: '8px 16px', borderRadius: '8px', fontSize: '14px' }}>
@@ -103,7 +103,7 @@ function SkillsContent() {
       </div>
 
       <div>
-        <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: '#aaa', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Tools</h3>
+        <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: '#fff', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Tools</h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
           {skills.tools.map((s, i) => (
             <span key={i} style={{ background: '#1a1a1a', padding: '8px 16px', borderRadius: '8px', fontSize: '14px' }}>
@@ -177,23 +177,23 @@ function ContactContent() {
       <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '24px' }}>Contact</h1>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '500px' }}>
         <div style={{ padding: '16px', background: '#1a1a1a', borderRadius: '12px' }}>
-          <div style={{ fontSize: '12px', color: '#888', marginBottom: '6px' }}>Email</div>
+          <div style={{ fontSize: '12px', color: '#fff', marginBottom: '6px' }}>Email</div>
           <div style={{ fontSize: '16px' }}>{personalInfo.email}</div>
         </div>
         <div style={{ padding: '16px', background: '#1a1a1a', borderRadius: '12px' }}>
-          <div style={{ fontSize: '12px', color: '#888', marginBottom: '6px' }}>Phone</div>
+          <div style={{ fontSize: '12px', color: '#fff', marginBottom: '6px' }}>Phone</div>
           <div style={{ fontSize: '16px' }}>{personalInfo.phone}</div>
         </div>
         <div style={{ padding: '16px', background: '#1a1a1a', borderRadius: '12px' }}>
-          <div style={{ fontSize: '12px', color: '#888', marginBottom: '6px' }}>Location</div>
+          <div style={{ fontSize: '12px', color: '#fff', marginBottom: '6px' }}>Location</div>
           <div style={{ fontSize: '16px' }}>{personalInfo.location}</div>
         </div>
         <div style={{ padding: '16px', background: '#1a1a1a', borderRadius: '12px' }}>
-          <div style={{ fontSize: '12px', color: '#888', marginBottom: '6px' }}>LinkedIn</div>
+          <div style={{ fontSize: '12px', color: '#fff', marginBottom: '6px' }}>LinkedIn</div>
           <div style={{ fontSize: '16px' }}>{personalInfo.linkedin.replace('https://', '')}</div>
         </div>
         <div style={{ padding: '16px', background: '#1a1a1a', borderRadius: '12px' }}>
-          <div style={{ fontSize: '12px', color: '#888', marginBottom: '6px' }}>GitHub</div>
+          <div style={{ fontSize: '12px', color: '#fff', marginBottom: '6px' }}>GitHub</div>
           <div style={{ fontSize: '16px' }}>{personalInfo.github.replace('https://', '')}</div>
         </div>
       </div>
