@@ -1,21 +1,22 @@
 import { useState } from 'react';
 import DitherBackground from './components/DitherBackground';
+import TargetCursor from './components/TargetCursor';
 import FlowingMenu from './components/FlowingMenu';
 import { personalInfo, skills, education, projects, certifications } from './data/content';
 
 function AboutContent() {
   return (
     <div style={{ color: '#fff' }}>
-      <h1 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '24px' }}>About Me</h1>
-      <p style={{ fontSize: '15px', lineHeight: 1.7, marginBottom: '24px', color: 'rgba(255,255,255,0.75)' }}>
+      <h1 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '20px' }}>About Me</h1>
+      <p style={{ fontSize: '14px', lineHeight: 1.7, marginBottom: '20px', color: '#bbb' }}>
         {personalInfo.summary}
       </p>
-      <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '16px' }}>Education</h2>
+      <h2 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px', marginTop: '24px' }}>Education</h2>
       {education.map((edu, i) => (
-        <div key={i} style={{ marginBottom: '16px' }}>
-          <div style={{ fontWeight: 600, fontSize: '16px' }}>{edu.institution}</div>
-          <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px' }}>{edu.degree}</div>
-          <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px' }}>{edu.period}</div>
+        <div key={i} style={{ marginBottom: '12px', padding: '12px', background: '#1a1a1a', borderRadius: '8px' }}>
+          <div style={{ fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>{edu.institution}</div>
+          <div style={{ color: '#888', fontSize: '13px' }}>{edu.degree}</div>
+          <div style={{ color: '#666', fontSize: '12px' }}>{edu.period}</div>
         </div>
       ))}
     </div>
@@ -25,35 +26,35 @@ function AboutContent() {
 function SkillsContent() {
   return (
     <div style={{ color: '#fff' }}>
-      <h1 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '24px' }}>Technical Skills</h1>
+      <h1 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '20px' }}>Technical Skills</h1>
       
-      <div style={{ marginBottom: '20px' }}>
-        <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: 'rgba(255,255,255,0.5)' }}>Languages</h3>
+      <div style={{ marginBottom: '16px' }}>
+        <h3 style={{ fontSize: '13px', fontWeight: 600, marginBottom: '10px', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>Languages</h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
           {skills.languages.map((s, i) => (
-            <span key={i} style={{ background: 'rgba(255,255,255,0.08)', padding: '6px 14px', borderRadius: '20px', fontSize: '13px' }}>
+            <span key={i} style={{ background: '#1a1a1a', padding: '6px 12px', borderRadius: '6px', fontSize: '13px' }}>
               {s.name}
             </span>
           ))}
         </div>
       </div>
 
-      <div style={{ marginBottom: '20px' }}>
-        <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: 'rgba(255,255,255,0.5)' }}>Frameworks</h3>
+      <div style={{ marginBottom: '16px' }}>
+        <h3 style={{ fontSize: '13px', fontWeight: 600, marginBottom: '10px', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>Frameworks</h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
           {skills.frameworks.map((s, i) => (
-            <span key={i} style={{ background: 'rgba(255,255,255,0.08)', padding: '6px 14px', borderRadius: '20px', fontSize: '13px' }}>
+            <span key={i} style={{ background: '#1a1a1a', padding: '6px 12px', borderRadius: '6px', fontSize: '13px' }}>
               {s.name}
             </span>
           ))}
         </div>
       </div>
 
-      <div style={{ marginBottom: '20px' }}>
-        <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: 'rgba(255,255,255,0.5)' }}>Security</h3>
+      <div style={{ marginBottom: '16px' }}>
+        <h3 style={{ fontSize: '13px', fontWeight: 600, marginBottom: '10px', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>Security</h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
           {skills.security.map((s, i) => (
-            <span key={i} style={{ background: 'rgba(255,255,255,0.08)', padding: '6px 14px', borderRadius: '20px', fontSize: '13px' }}>
+            <span key={i} style={{ background: '#1a1a1a', padding: '6px 12px', borderRadius: '6px', fontSize: '13px' }}>
               {s.name}
             </span>
           ))}
@@ -61,10 +62,10 @@ function SkillsContent() {
       </div>
 
       <div>
-        <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: 'rgba(255,255,255,0.5)' }}>Tools</h3>
+        <h3 style={{ fontSize: '13px', fontWeight: 600, marginBottom: '10px', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>Tools</h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
           {skills.tools.map((s, i) => (
-            <span key={i} style={{ background: 'rgba(255,255,255,0.08)', padding: '6px 14px', borderRadius: '20px', fontSize: '13px' }}>
+            <span key={i} style={{ background: '#1a1a1a', padding: '6px 12px', borderRadius: '6px', fontSize: '13px' }}>
               {s.name}
             </span>
           ))}
@@ -77,21 +78,21 @@ function SkillsContent() {
 function ProjectsContent() {
   return (
     <div style={{ color: '#fff' }}>
-      <h1 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '24px' }}>Projects</h1>
+      <h1 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '20px' }}>Projects</h1>
       {projects.map((project, i) => (
-        <div key={i} style={{ marginBottom: '32px' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '12px' }}>{project.title}</h2>
-          <p style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, marginBottom: '16px', fontSize: '14px' }}>{project.description}</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
+        <div key={i} style={{ marginBottom: '24px', paddingBottom: '20px', borderBottom: i < projects.length - 1 ? '1px solid #222' : 'none' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '10px' }}>{project.title}</h2>
+          <p style={{ color: '#bbb', lineHeight: 1.6, marginBottom: '14px', fontSize: '14px' }}>{project.description}</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
             {project.technologies.map((tech, j) => (
-              <span key={j} style={{ background: 'rgba(255,255,255,0.08)', padding: '4px 12px', borderRadius: '16px', fontSize: '12px' }}>
+              <span key={j} style={{ background: '#1a1a1a', padding: '4px 10px', borderRadius: '4px', fontSize: '12px' }}>
                 {tech}
               </span>
             ))}
           </div>
-          <ul style={{ paddingLeft: '18px', color: 'rgba(255,255,255,0.7)', fontSize: '14px' }}>
+          <ul style={{ paddingLeft: '16px', color: '#999', fontSize: '13px' }}>
             {project.features.map((feature, j) => (
-              <li key={j} style={{ marginBottom: '8px', lineHeight: 1.5 }}>{feature}</li>
+              <li key={j} style={{ marginBottom: '6px' }}>{feature}</li>
             ))}
           </ul>
         </div>
@@ -103,26 +104,24 @@ function ProjectsContent() {
 function CertificationsContent() {
   return (
     <div style={{ color: '#fff' }}>
-      <h1 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '24px' }}>Certifications</h1>
+      <h1 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '20px' }}>Certifications</h1>
       {certifications.map((cert, i) => (
-        <div key={i} style={{ marginBottom: '28px', paddingBottom: '24px', borderBottom: i < certifications.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>{cert.title}</h2>
-          <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', marginBottom: '12px' }}>
-            {cert.issuer} | {cert.date}
-          </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+        <div key={i} style={{ marginBottom: '20px', paddingBottom: '16px', borderBottom: i < certifications.length - 1 ? '1px solid #222' : 'none' }}>
+          <h2 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '6px' }}>{cert.title}</h2>
+          <div style={{ color: '#888', fontSize: '12px', marginBottom: '10px' }}>{cert.issuer} | {cert.date}</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
             {cert.skills.map((skill, j) => (
-              <span key={j} style={{ background: 'rgba(255,255,255,0.08)', padding: '4px 10px', borderRadius: '12px', fontSize: '12px' }}>
+              <span key={j} style={{ background: '#1a1a1a', padding: '4px 10px', borderRadius: '4px', fontSize: '11px' }}>
                 {skill}
               </span>
             ))}
           </div>
-          <ul style={{ paddingLeft: '18px', color: 'rgba(255,255,255,0.65)', fontSize: '13px' }}>
-            {cert.bullets.slice(0, 5).map((bullet, j) => (
-              <li key={j} style={{ marginBottom: '6px' }}>{bullet}</li>
+          <ul style={{ paddingLeft: '16px', color: '#999', fontSize: '12px' }}>
+            {cert.bullets.slice(0, 4).map((bullet, j) => (
+              <li key={j} style={{ marginBottom: '4px' }}>{bullet}</li>
             ))}
-            {cert.bullets.length > 5 && (
-              <li style={{ color: 'rgba(255,255,255,0.4)' }}>+ {cert.bullets.length - 5} more...</li>
+            {cert.bullets.length > 4 && (
+              <li style={{ color: '#666' }}>+ {cert.bullets.length - 4} more...</li>
             )}
           </ul>
         </div>
@@ -134,27 +133,27 @@ function CertificationsContent() {
 function ContactContent() {
   return (
     <div style={{ color: '#fff' }}>
-      <h1 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '24px' }}>Contact</h1>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <div>
-          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px' }}>Email</div>
-          <div style={{ fontSize: '16px' }}>{personalInfo.email}</div>
+      <h1 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '20px' }}>Contact</h1>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ padding: '14px', background: '#1a1a1a', borderRadius: '8px' }}>
+          <div style={{ fontSize: '11px', color: '#666', marginBottom: '4px' }}>Email</div>
+          <div style={{ fontSize: '14px' }}>{personalInfo.email}</div>
         </div>
-        <div>
-          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px' }}>Phone</div>
-          <div style={{ fontSize: '16px' }}>{personalInfo.phone}</div>
+        <div style={{ padding: '14px', background: '#1a1a1a', borderRadius: '8px' }}>
+          <div style={{ fontSize: '11px', color: '#666', marginBottom: '4px' }}>Phone</div>
+          <div style={{ fontSize: '14px' }}>{personalInfo.phone}</div>
         </div>
-        <div>
-          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px' }}>Location</div>
-          <div style={{ fontSize: '16px' }}>{personalInfo.location}</div>
+        <div style={{ padding: '14px', background: '#1a1a1a', borderRadius: '8px' }}>
+          <div style={{ fontSize: '11px', color: '#666', marginBottom: '4px' }}>Location</div>
+          <div style={{ fontSize: '14px' }}>{personalInfo.location}</div>
         </div>
-        <div>
-          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px' }}>LinkedIn</div>
-          <div style={{ fontSize: '16px' }}>{personalInfo.linkedin.replace('https://', '')}</div>
+        <div style={{ padding: '14px', background: '#1a1a1a', borderRadius: '8px' }}>
+          <div style={{ fontSize: '11px', color: '#666', marginBottom: '4px' }}>LinkedIn</div>
+          <div style={{ fontSize: '14px' }}>{personalInfo.linkedin.replace('https://', '')}</div>
         </div>
-        <div>
-          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px' }}>GitHub</div>
-          <div style={{ fontSize: '16px' }}>{personalInfo.github.replace('https://', '')}</div>
+        <div style={{ padding: '14px', background: '#1a1a1a', borderRadius: '8px' }}>
+          <div style={{ fontSize: '11px', color: '#666', marginBottom: '4px' }}>GitHub</div>
+          <div style={{ fontSize: '14px' }}>{personalInfo.github.replace('https://', '')}</div>
         </div>
       </div>
     </div>
@@ -186,7 +185,8 @@ function App() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', position: 'relative' }}>
+    <div style={{ minHeight: '100vh', background: '#0a0a0a' }}>
+      <TargetCursor />
       <DitherBackground />
       
       <FlowingMenu 
