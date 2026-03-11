@@ -170,7 +170,6 @@ export const menu3dItems = [
       personalInfo.title,
       personalInfo.location,
       personalInfo.email,
-      personalInfo.phone,
       personalInfo.linkedin.replace('https://', ''),
       personalInfo.github.replace('https://', ''),
     ],
