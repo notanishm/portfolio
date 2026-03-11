@@ -2,7 +2,6 @@ export const personalInfo = {
   name: 'Anish Maisekar',
   title: 'B.E. Student | Application Security & Software Development',
   email: 'anishmaisekar@outlook.com',
-  phone: '+91-8668726893',
   location: 'Pune, Maharashtra, India',
   linkedin: 'https://linkedin.com/in/anish-maisekar',
   github: 'https://github.com/notanishm',
