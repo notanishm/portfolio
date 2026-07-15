@@ -130,8 +130,7 @@ const PROJECT_COLORS = {
 function ProjectsContent() {
   return (
     <div style={{ color: '#fff' }}>
-      <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>Projects</h1>
-      <p style={{ color: '#888', marginBottom: '32px', fontSize: '15px' }}>A selection of things I've built</p>
+      <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '24px' }}>Projects</h1>
       <div
         style={{
           display: 'grid',
