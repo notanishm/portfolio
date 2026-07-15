@@ -3,6 +3,15 @@
   transition: padding 0.3s ease, max-width 0.3s ease;
 }
 
+.project-card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.project-card-hover:hover {
+  transform: translateY(-2px);
+}
+
 /* Responsive flex gaps */
 .about-header {
   transition: flex-direction 0.3s ease, align-items 0.3s ease;

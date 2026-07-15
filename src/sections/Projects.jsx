@@ -1,7 +1,16 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { ExternalLink, Github, Folder, ArrowUpRight, Shield, Globe } from 'lucide-react';
+import { ExternalLink, Github, ArrowUpRight } from 'lucide-react';
 import { projects, personalInfo } from '../data/content';
+import BorderGlow from '../components/BorderGlow';
+
+const PROJECT_COLORS = {
+  Web: ['#c084fc', '#a78bfa', '#818cf8'],
+  App: ['#38bdf8', '#22d3ee', '#67e8f9'],
+  'Full Stack': ['#f472b6', '#fb923c', '#fbbf24'],
+  ML: ['#34d399', '#a3e635', '#facc15'],
+  Security: ['#f87171', '#fb923c', '#fbbf24'],
+};
 
 const ProjectCard = ({ project, index }) => {
   const ref = useRef(null);
@@ -10,123 +19,72 @@ const ProjectCard = ({ project, index }) => {
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group"
+      transition={{ duration: 0.4, delay: index * 0.08 }}
     >
-      <div className="h-full bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700">
-        {/* Project Header */}
-        <div className="p-6 sm:p-8">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
-                {project.category === 'Security' ? (
-                  <Shield size={24} />
-                ) : (
-                  <Folder size={24} />
-                )}
+      <a
+        href={project.github}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ textDecoration: 'none', color: 'inherit' }}
+      >
+        <BorderGlow
+          edgeSensitivity={30}
+          glowColor="40 80 80"
+          backgroundColor="#120F17"
+          borderRadius={16}
+          glowRadius={30}
+          glowIntensity={0.8}
+          coneSpread={25}
+          animated={false}
+          colors={PROJECT_COLORS[project.category] || PROJECT_COLORS.Web}
+          fillOpacity={0.4}
+        >
+          <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px', minHeight: '180px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '36px', height: '36px', borderRadius: '8px',
+                  background: '#1a1a1a', border: '1px solid #262626',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '16px', fontWeight: 700, color: '#fff',
+                }}>
+                  {project.title.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <div style={{ fontSize: '15px', fontWeight: 600, color: '#ededed' }}>{project.title}</div>
+                  <div style={{ fontSize: '12px', color: '#666', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{project.category}</div>
+                </div>
               </div>
-              <div>
-                {project.category ? (
-                  <span className="text-xs font-medium text-primary-600 dark:text-primary-400 uppercase tracking-wider">
-                    {project.category}
-                  </span>
-                ) : null}
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                  {project.title}
-                </h3>
-              </div>
+              <ExternalLink size={14} style={{ color: '#555' }} />
             </div>
-            <div className="flex gap-2">
-              {project.github && (
-                <motion.a
-                  href={project.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-primary-100 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-400 transition-all"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <Github size={18} />
-                </motion.a>
-              )}
-              {project.live && (
-                <motion.a
-                  href={project.live}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-primary-100 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-400 transition-all"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <ExternalLink size={18} />
-                </motion.a>
-              )}
-            </div>
-          </div>
 
-          {/* Description */}
-          {project.description ? (
-            <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+            <p style={{ fontSize: '14px', color: '#888', lineHeight: 1.6, margin: 0, flex: 1 }}>
               {project.description}
             </p>
-          ) : (
-            <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
-              Details will appear here once added from the resume.
-            </p>
-          )}
 
-          {/* Features */}
-          {Array.isArray(project.features) && project.features.length > 0 ? (
-            <div className="mb-6">
-              <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                Key Features
-              </h4>
-              <ul className="space-y-2">
-                {project.features.slice(0, 3).map((feature, idx) => (
-                  <li
-                    key={idx}
-                    className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400"
-                  >
-                    <ArrowUpRight size={14} className="mt-0.5 text-primary-500 flex-shrink-0" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-
-          {/* Technologies */}
-          {Array.isArray(project.technologies) && project.technologies.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {project.technologies.map((tech, idx) => (
-                <span
-                  key={idx}
-                  className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium rounded-full"
-                >
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+              {project.technologies.map((tech, j) => (
+                <span key={j} style={{
+                  padding: '3px 8px', borderRadius: '6px', fontSize: '11px',
+                  fontWeight: 500, background: '#1a1a1a', border: '1px solid #262626', color: '#888',
+                }}>
                   {tech}
                 </span>
               ))}
             </div>
-          ) : null}
-        </div>
-
-        {/* Hover Effect Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-primary-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-      </div>
+          </div>
+        </BorderGlow>
+      </a>
     </motion.div>
   );
 };
 
 const Projects = () => {
   return (
-    <section
-      id="projects"
-      className="py-20 sm:py-32 bg-white dark:bg-gray-900"
-    >
+    <section id="projects" className="py-20 sm:py-32 bg-white dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -142,21 +100,19 @@ const Projects = () => {
           </p>
         </motion.div>
 
-        {/* Projects Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project, index) => (
             <ProjectCard key={project.id} project={project} index={index} />
           ))}
         </div>
 
-        {/* View All Projects CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-center mt-12"
         >
-        <motion.a
+          <motion.a
             href={personalInfo.github}
             target="_blank"
             rel="noopener noreferrer"

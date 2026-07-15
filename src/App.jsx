@@ -3,6 +3,7 @@ import Dither from './components/Dither';
 import TargetCursor from './components/TargetCursor';
 import FlowingMenu from './components/FlowingMenu';
 import ScrambledText from './components/ScrambledText';
+import BorderGlow from './components/BorderGlow';
 import { personalInfo, skills, education, projects, certifications } from './data/content';
 import './App.css';
 
@@ -118,28 +119,121 @@ function SkillsContent() {
   );
 }
 
+const PROJECT_COLORS = {
+  Web: ['#c084fc', '#a78bfa', '#818cf8'],
+  App: ['#38bdf8', '#22d3ee', '#67e8f9'],
+  'Full Stack': ['#f472b6', '#fb923c', '#fbbf24'],
+  ML: ['#34d399', '#a3e635', '#facc15'],
+  Security: ['#f87171', '#fb923c', '#fbbf24'],
+};
+
 function ProjectsContent() {
   return (
     <div style={{ color: '#fff' }}>
-      <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '24px' }}>Projects</h1>
-      {projects.map((project, i) => (
-        <div key={i} style={{ marginBottom: '32px', paddingBottom: '24px', borderBottom: i < projects.length - 1 ? '1px solid #333' : 'none' }}>
-          <h2 style={{ fontSize: '22px', fontWeight: 600, marginBottom: '12px' }}>{project.title}</h2>
-          <p style={{ color: '#fff', lineHeight: 1.7, marginBottom: '16px', fontSize: '15px' }}>{project.description}</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
-            {project.technologies.map((tech, j) => (
-              <span key={j} style={{ background: '#1a1a1a', padding: '6px 12px', borderRadius: '6px', fontSize: '13px' }}>
-                {tech}
-              </span>
-            ))}
-          </div>
-          <ul style={{ paddingLeft: '20px', color: '#fff', fontSize: '14px' }}>
-            {project.features.map((feature, j) => (
-              <li key={j} style={{ marginBottom: '8px' }}>{feature}</li>
-            ))}
-          </ul>
-        </div>
-      ))}
+      <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>Projects</h1>
+      <p style={{ color: '#888', marginBottom: '32px', fontSize: '15px' }}>A selection of things I've built</p>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: '16px',
+        }}
+      >
+        {projects.map((project) => (
+          <a
+            key={project.id}
+            href={project.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ textDecoration: 'none', color: 'inherit' }}
+            className="cursor-target"
+          >
+            <BorderGlow
+              edgeSensitivity={30}
+              glowColor="40 80 80"
+              backgroundColor="#120F17"
+              borderRadius={16}
+              glowRadius={30}
+              glowIntensity={0.8}
+              coneSpread={25}
+              animated={false}
+              colors={PROJECT_COLORS[project.category] || PROJECT_COLORS.Web}
+              fillOpacity={0.4}
+              className="project-card-hover"
+            >
+              <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px', minHeight: '180px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '8px',
+                        background: '#1a1a1a',
+                        border: '1px solid #262626',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '16px',
+                        fontWeight: 700,
+                        color: '#fff',
+                      }}
+                    >
+                      {project.title.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '15px', fontWeight: 600, color: '#ededed' }}>
+                        {project.title}
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#666', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        {project.category}
+                      </div>
+                    </div>
+                  </div>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    style={{ color: '#555', flexShrink: 0 }}
+                  >
+                    <path
+                      d="M4 12L12 4M12 4H6M12 4V10"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+
+                <p style={{ fontSize: '14px', color: '#888', lineHeight: 1.6, margin: 0, flex: 1 }}>
+                  {project.description}
+                </p>
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {project.technologies.map((tech, j) => (
+                    <span
+                      key={j}
+                      style={{
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        fontSize: '11px',
+                        fontWeight: 500,
+                        background: '#1a1a1a',
+                        border: '1px solid #262626',
+                        color: '#888',
+                      }}
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </BorderGlow>
+          </a>
+        ))}
+      </div>
     </div>
   );
 }
