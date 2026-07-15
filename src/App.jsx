@@ -136,6 +136,7 @@ function ProjectsContent() {
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gridAutoRows: '1fr',
           gap: '16px',
         }}
       >
@@ -145,7 +146,7 @@ function ProjectsContent() {
             href={project.github}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ textDecoration: 'none', color: 'inherit' }}
+            style={{ textDecoration: 'none', color: 'inherit', display: 'flex' }}
             className="cursor-target"
           >
             <BorderGlow
@@ -160,8 +161,9 @@ function ProjectsContent() {
               colors={PROJECT_COLORS[project.category] || PROJECT_COLORS.Web}
               fillOpacity={0.4}
               className="project-card-hover"
+              style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
             >
-              <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px', minHeight: '180px' }}>
+              <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px', height: '240px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <div
@@ -207,11 +209,11 @@ function ProjectsContent() {
                   </svg>
                 </div>
 
-                <p style={{ fontSize: '14px', color: '#888', lineHeight: 1.6, margin: 0, flex: 1 }}>
+                <p style={{ fontSize: '14px', color: '#888', lineHeight: 1.6, margin: 0, flex: 1, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
                   {project.description}
                 </p>
 
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: 'auto' }}>
                   {project.technologies.map((tech, j) => (
                     <span
                       key={j}
