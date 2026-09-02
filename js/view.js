@@ -30,11 +30,47 @@ const View = {
       el.textContent = el.dataset.ransom;
     });
     this.els.sfx.volume = 0.45;
+    this.forceLoadMenuFont();
     this.startClock();
     this.startParallax();
     this.startCursor();
     this.bindSlashMenu();
     document.body.classList.add("loaded");
+  },
+
+  forceLoadMenuFont() {
+    const url = "assets/fonts/Persona5MenuFontPrototype-Regular.ttf";
+    const reveal = () => {
+      document.body.classList.add("font-ready");
+      this.layoutMenuOnSlash();
+    };
+    const load = () => {
+      if (document.fonts && document.fonts.check('16px "Persona5 Menu"')) {
+        reveal();
+        return;
+      }
+      if (typeof FontFace === "function") {
+        const face = new FontFace("Persona5 Menu", `url("${url}") format("truetype")`, {
+          weight: "normal",
+          style: "normal",
+          display: "block",
+        });
+        face.load().then(loaded => {
+          document.fonts.add(loaded);
+          return Promise.all([
+            document.fonts.load('1em "Persona5 Menu"'),
+            document.fonts.load('48px "Persona5 Menu"'),
+            document.fonts.load('72px "Persona5 Menu"'),
+          ]);
+        }).then(reveal).catch(reveal);
+      } else if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(reveal);
+      } else {
+        reveal();
+      }
+    };
+    load();
+    setTimeout(reveal, 3000);
   },
 
   hash(str) {

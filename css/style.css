@@ -3,7 +3,7 @@
   src:url("../assets/fonts/Persona5MenuFontPrototype-Regular.ttf") format("truetype");
   font-weight:normal;
   font-style:normal;
-  font-display:swap;
+  font-display:block;
 }
 :root{
   --red:#e60012;
@@ -23,16 +23,19 @@ body{
   -webkit-font-smoothing:antialiased;
   user-select:none;
 }
-.display{font-family:'Persona5 Menu','Archivo Black','Arial Black',Impact,sans-serif;}
+.display{font-family:"Persona5 Menu",sans-serif;}
 .p5-title{
-  font-family:"Persona5 Menu","Archivo Black",Impact,sans-serif;
+  font-family:"Persona5 Menu",sans-serif;
   font-weight:normal;
   font-style:normal;
   letter-spacing:.02em;
   line-height:.92;
   text-transform:uppercase;
   white-space:nowrap;
+  visibility:hidden;
 }
+body.font-ready .p5-title,
+body.font-ready .exit-btn{visibility:visible;}
 
 /* ============ BACKGROUND LAYERS ============ */
 #bg{position:fixed;inset:-6vmax;z-index:0;pointer-events:none;}
@@ -223,10 +226,11 @@ body[data-screen]:not([data-screen="home"]) #slash{
 /* ---------- SUB-SCREEN CHROME ---------- */
 .sub{background:transparent;}
 .exit-btn{
+  visibility:hidden;
   display:inline-block;align-self:flex-start;
   margin:0 0 18px;
   border:0;cursor:pointer;
-  font-family:"Persona5 Menu","Archivo Black",Impact,sans-serif;
+  font-family:"Persona5 Menu",sans-serif;
   font-size:clamp(18px,2.4vmin,28px);
   letter-spacing:.08em;text-transform:uppercase;
   background:var(--red);color:var(--white);
