@@ -1,9 +1,3 @@
-node_modules/
-dist/
 .DS_Store
-.env
-.env.*
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.vite/
+.cursor/
+*.swp
