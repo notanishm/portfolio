@@ -123,16 +123,29 @@ const Controller = {
     const unlock = () => this.unlockAudio();
     addEventListener("pointerdown", unlock, { capture: true });
     addEventListener("keydown", unlock, { capture: true });
+    addEventListener("touchstart", unlock, { capture: true, passive: true });
   },
 
   unlockAudio() {
-    if (this.audioUnlocked && !this.bgmHeldSilent) return;
     this.audioUnlocked = true;
     this.bgmHeldSilent = false;
+    this.startBgm(false);
+  },
+
+  startBgm(allowMutedFallback) {
     const bgm = document.getElementById("bgm");
-    if (!bgm) return;
-    bgm.muted = this.userMuted;
-    if (!this.userMuted) bgm.play().catch(() => {});
+    const vol = document.getElementById("bgm-vol");
+    if (!bgm || this.userMuted) return;
+    if (vol) bgm.volume = Number(vol.value) / 100;
+    bgm.muted = false;
+    const attempt = bgm.play();
+    if (!attempt) return;
+    attempt.catch(() => {
+      if (!allowMutedFallback || this.audioUnlocked) return;
+      this.bgmHeldSilent = true;
+      bgm.muted = true;
+      bgm.play().catch(() => {});
+    });
   },
 
   bindBgm() {
@@ -144,7 +157,7 @@ const Controller = {
     const applyVol = () => {
       const v = Number(vol.value) / 100;
       bgm.volume = v;
-      bgm.muted = this.userMuted || this.bgmHeldSilent;
+      bgm.muted = this.userMuted || (!this.audioUnlocked && this.bgmHeldSilent);
       const silent = this.userMuted || v === 0;
       mute.classList.toggle("is-muted", silent);
       mute.setAttribute("aria-pressed", silent ? "true" : "false");
@@ -154,42 +167,36 @@ const Controller = {
     bgm.volume = Number(vol.value) / 100;
     applyVol();
     bgm.load();
+    this.startBgm(true);
 
-    const tryPlay = async () => {
+    const resumeIfAllowed = () => {
       if (this.userMuted) return;
-      try {
-        bgm.muted = this.bgmHeldSilent;
-        await bgm.play();
-      } catch {
-        this.bgmHeldSilent = true;
-        bgm.muted = true;
-        bgm.play().catch(() => {});
-      }
+      if (this.audioUnlocked) this.startBgm(false);
+      else this.startBgm(true);
     };
-
-    tryPlay();
-    bgm.addEventListener("canplay", tryPlay, { once: true });
-    bgm.addEventListener("canplaythrough", tryPlay, { once: true });
+    bgm.addEventListener("canplay", resumeIfAllowed);
+    bgm.addEventListener("canplaythrough", resumeIfAllowed);
+    bgm.addEventListener("ended", () => {
+      if (!this.userMuted) bgm.play().catch(() => {});
+    });
 
     mute.addEventListener("click", e => {
       e.stopPropagation();
       this.userMuted = !this.userMuted;
-      this.bgmHeldSilent = false;
       this.audioUnlocked = true;
+      this.bgmHeldSilent = false;
       applyVol();
-      if (!this.userMuted) bgm.play().catch(() => {});
+      if (!this.userMuted) this.startBgm(false);
+      else bgm.pause();
     });
 
     vol.addEventListener("input", () => {
       if (Number(vol.value) > 0) this.userMuted = false;
+      this.audioUnlocked = true;
       this.bgmHeldSilent = false;
       applyVol();
-      if (!this.userMuted) {
-        this.audioUnlocked = true;
-        bgm.play().catch(() => {});
-      }
+      if (!this.userMuted) this.startBgm(false);
     });
-    vol.addEventListener("pointerdown", e => e.stopPropagation());
   },
 
   /* ---------- Input bindings ---------- */
