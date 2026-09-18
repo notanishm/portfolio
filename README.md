@@ -1,1 +1,1 @@
-Static Persona 5 portfolio. Vercel should treat this as a **static** site (no install, no build). If an old Vite project is still selected in Vercel, set Framework to Other, clear the build command, and set Output Directory to `.`.
+Persona!!
